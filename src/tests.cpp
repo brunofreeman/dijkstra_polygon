@@ -45,14 +45,32 @@ int main(int argc, char** argv) {
     srand(time(NULL));
     srand48(time(NULL));
 
-    // counterclockwise winding unit square, min(x, y) = (0, 0)
-    Polygon unit_square(1);
-    push(unit_square[0], 0, 0);
-    push(unit_square[0], 1, 0);
-    push(unit_square[0], 1, 1);
-    push(unit_square[0], 0, 1);
-    PointPair unit_square_se = pp(0.25, 0.25, 0.75, 0.75);
-    print_info("unit_square", unit_square, unit_square_se);
+    bool do_unit_square_q1 = true;
+    bool do_unit_square_all_q = true;
+
+    if (do_unit_square_q1) { // PASS
+        // counterclockwise winding
+        Polygon unit_square_q1(1);
+        push(unit_square_q1[0], 0, 0);
+        push(unit_square_q1[0], 1, 0);
+        push(unit_square_q1[0], 1, 1);
+        push(unit_square_q1[0], 0, 1);
+        PointPair unit_square_q1_se = pp(0.25, 0.25, 0.75, 0.75);
+        print_info("unit_square_q1", unit_square_q1, unit_square_q1_se);
+    }
+
+    if (do_unit_square_all_q) {
+        // clockwise winding
+        Polygon unit_square_all_q(1);
+        push(unit_square_all_q[0], -0.5, -0.5);
+        push(unit_square_all_q[0], -0.5,  0.5);
+        push(unit_square_all_q[0],  0.5,  0.5);
+        push(unit_square_all_q[0],  0.5, -0.5);
+        PointPair unit_square_all_q_se = pp(-0.25, -0.25, 0.25, 0.25);
+        print_info("unit_square_all_q", unit_square_all_q, unit_square_all_q_se);
+    }
+    
+
 
     return 0;
 }
