@@ -47,10 +47,12 @@ int main(int argc, char** argv) {
 
     bool do_unit_square_q1 = true;
     bool do_unit_square_all_q = true;
+    bool do_sq_in_sq = true;
 
+    // counterclockwise winding
     if (do_unit_square_q1) { // PASS
-        // counterclockwise winding
         Polygon unit_square_q1(1);
+        // unit square, bottom left corner on origin
         push(unit_square_q1[0], 0, 0);
         push(unit_square_q1[0], 1, 0);
         push(unit_square_q1[0], 1, 1);
@@ -59,9 +61,10 @@ int main(int argc, char** argv) {
         print_info("unit_square_q1", unit_square_q1, unit_square_q1_se);
     }
 
-    if (do_unit_square_all_q) {
-        // clockwise winding
+    // clockwise winding
+    if (do_unit_square_all_q) { // PASS
         Polygon unit_square_all_q(1);
+        // unit square centered on origin
         push(unit_square_all_q[0], -0.5, -0.5);
         push(unit_square_all_q[0], -0.5,  0.5);
         push(unit_square_all_q[0],  0.5,  0.5);
@@ -69,7 +72,24 @@ int main(int argc, char** argv) {
         PointPair unit_square_all_q_se = pp(-0.25, -0.25, 0.25, 0.25);
         print_info("unit_square_all_q", unit_square_all_q, unit_square_all_q_se);
     }
-    
+
+    // clockwise winding boundary, counterclockwise winding hole
+    if (do_sq_in_sq) {
+        Polygon sq_in_sq(2);
+        // boundary: unit square centered on origin
+        push(sq_in_sq[0], -0.5, -0.5);
+        push(sq_in_sq[0], -0.5,  0.5);
+        push(sq_in_sq[0],  0.5,  0.5);
+        push(sq_in_sq[0],  0.5, -0.5);
+        // hole: 0.2-side square centered on origin
+        push(sq_in_sq[1], -0.1, -0.1);
+        push(sq_in_sq[1],  0.1, -0.1);
+        push(sq_in_sq[1],  0.1,  0.1);
+        push(sq_in_sq[1], -0.1,  0.1);
+        PointPair sq_in_sq_se = pp(-0.4, -0.4, 0.4, 0.4);
+        print_info("sq_in_sq", sq_in_sq, sq_in_sq_se);
+    }
+
 
 
     return 0;

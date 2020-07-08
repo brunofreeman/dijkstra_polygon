@@ -43,6 +43,11 @@ bool operator==(const Point& p, const Point& q) {
     return is_close(p.x, q.x) && is_close(p.y, q.y);
 }
 
+// TODO: only added for debug
+bool operator==(const Segment& seg1, const Segment& seg2) {
+    return seg1.p1 == seg2.p1 && seg1.p2 == seg2.p2;
+}
+
 bool is_neighbor_idx(size_t i, size_t j, const size_t size) {
     size_t temp = i > j ? i : j;
     j = j < i ? j : i;
@@ -57,9 +62,13 @@ enum Orientation {
 };
 
 Orientation orientation(const Point& p, const Point& q, const Point& r) {
-	int value = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
-	if (is_close(value, 0.0)) return COLINEAR;
-	return value > 0 ? CLOCKWISE : COUNTERCLOCKWISE;
+	double value = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
+	if (is_close(value, 0.0)) {
+        return COLINEAR;
+    }
+	else {
+        return value > 0 ? CLOCKWISE : COUNTERCLOCKWISE;
+    }
 }
 
 bool share_endpoint(const Segment& seg1, const Segment& seg2) {
@@ -71,14 +80,41 @@ bool share_endpoint(const Segment& seg1, const Segment& seg2) {
     );
 }
 
+bool on_segment(const Segment& seg, const Point& point) {
+    auto max = [](double a, double b) {
+        return a > b ? a : b;
+    };
+    auto min = [](double a, double b) {
+        return a < b ? a : b;
+    };
+	return (point.x <= max(seg.p1.x, seg.p2.x) && point.x >= min(seg.p1.x, seg.p2.x) &&
+            point.y <= max(seg.p1.y, seg.p2.y) && point.y >= min(seg.p1.y, seg.p2.y));
+}
+
 bool check_intersect(const Segment& seg1, const Segment& seg2) {
     if (share_endpoint(seg1, seg2)) return false;
     Orientation o1 = orientation(seg1.p1, seg1.p2, seg2.p1);
     Orientation o2 = orientation(seg1.p1, seg1.p2, seg2.p2);
     Orientation o3 = orientation(seg2.p1, seg2.p2, seg1.p1);
     Orientation o4 = orientation(seg2.p1, seg2.p2, seg1.p2);
-    return o1 != o2 && o3 != o4;
+    /* if (seg1.p2 == (Point){0.1, -0.1}) {
+        std::cout << "o1: " + std::to_string(o1) << ", "
+                  << "o2: " + std::to_string(o2) << ", "
+                  << "o3: " + std::to_string(o3) << ", "
+                  << "o4: " + std::to_string(o4) << std::endl;
+        std::cout << std::to_string(on_segment(seg1, seg2.p1)) << ", "
+                  << std::to_string(on_segment(seg1, seg2.p2)) << ", "
+                  << std::to_string(on_segment(seg2, seg1.p1)) << ", "
+                  << std::to_string(on_segment(seg2, seg1.p2)) << std::endl;
+    } */
+    return (o1 != o2 && o3 != o4) ||
+           (o1 == COLINEAR && on_segment(seg1, seg2.p1)) ||
+           (o2 == COLINEAR && on_segment(seg1, seg2.p2)) ||
+           (o3 == COLINEAR && on_segment(seg2, seg1.p1)) ||
+           (o4 == COLINEAR && on_segment(seg2, seg1.p2));
 }
+
+std::string to_string(const Segment& seg);
 
 bool is_interior_chord(const std::vector<std::vector<Point>>& polygon, const Segment& seg) {
     for (size_t i = 0; i < polygon.size(); i++) {
@@ -86,7 +122,10 @@ bool is_interior_chord(const std::vector<std::vector<Point>>& polygon, const Seg
         do {
             size_t next_idx = (curr_idx + 1) % polygon[i].size();
             Segment seg_other = {polygon[i][curr_idx], polygon[i][next_idx]};
-            if (check_intersect(seg, seg_other)) return false;
+            if (check_intersect(seg, seg_other)) {
+                // std::cout << to_string(seg) << " intersects " << to_string(seg_other) << std::endl;
+                return false;
+            }
             curr_idx = next_idx;
         } while (curr_idx != 0);
     }
