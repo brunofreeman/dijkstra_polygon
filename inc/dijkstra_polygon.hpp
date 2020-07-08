@@ -27,7 +27,7 @@ struct IndexPair {
 
 struct Edge {
     IndexPair idxp;
-    double weight;
+    double distance;
 };
 
 struct Segment {
