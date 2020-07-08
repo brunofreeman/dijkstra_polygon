@@ -74,7 +74,7 @@ int main(int argc, char** argv) {
     }
 
     // clockwise winding boundary, counterclockwise winding hole
-    if (do_sq_in_sq) {
+    if (do_sq_in_sq) { // PASS
         Polygon sq_in_sq(2);
         // boundary: unit square centered on origin
         push(sq_in_sq[0], -0.5, -0.5);

@@ -43,10 +43,10 @@ bool operator==(const Point& p, const Point& q) {
     return is_close(p.x, q.x) && is_close(p.y, q.y);
 }
 
-// TODO: only added for debug
+/* // TODO: only added for debug
 bool operator==(const Segment& seg1, const Segment& seg2) {
     return seg1.p1 == seg2.p1 && seg1.p2 == seg2.p2;
-}
+} */
 
 bool is_neighbor_idx(size_t i, size_t j, const size_t size) {
     size_t temp = i > j ? i : j;
@@ -114,8 +114,9 @@ bool check_intersect(const Segment& seg1, const Segment& seg2) {
            (o4 == COLINEAR && on_segment(seg2, seg1.p2));
 }
 
-std::string to_string(const Segment& seg);
+// std::string to_string(const Segment& seg);
 
+// assumes !same_hole_non_neighbor
 bool is_interior_chord(const std::vector<std::vector<Point>>& polygon, const Segment& seg) {
     for (size_t i = 0; i < polygon.size(); i++) {
         size_t curr_idx = 0;
@@ -191,7 +192,11 @@ void populate_vertex_adjacency(const std::vector<std::vector<Point>>& polygon, c
             Point vertex_other = polygon[idxp_other.i][idxp_other.j];
             Segment seg = {vertex, vertex_other};
 
-            if ((i == idxp.i && is_neighbor_idx(j, idxp.j, polygon[i].size())) || is_interior_chord(polygon, seg)) {
+            bool same_poly = i == idxp.i;
+            bool neighbors = same_poly && is_neighbor_idx(j, idxp.j, polygon[i].size());
+            bool same_hole_non_neighbor = same_poly && i > 0 && !is_neighbor_idx(j, idxp.j, polygon[i].size());
+
+            if (!same_hole_non_neighbor && (neighbors || is_interior_chord(polygon, seg))) {
                 adj_list_row.push_back((Edge){idxp_other, length(seg)});
             }
         }
