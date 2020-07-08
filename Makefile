@@ -9,20 +9,19 @@ BIN_DIR = bin
 
 SOURCES = $(wildcard $(SRC_DIR)/*.cpp)
 OBJECTS = $(subst $(SRC_DIR), $(OBJ_DIR), $(SOURCES:.cpp=.o))
-TARGET = $(BIN_DIR)/tests
+
+TARGET = tests
+DEPS = $(INC_DIR)/dijkstra_polygon.hpp $(INC_DIR)/dijkstra_polygon_to_string.hpp
 
 folders:
 	mkdir -p $(INC_DIR) & mkdir -p $(SRC_DIR) & mkdir -p $(OBJ_DIR) & mkdir -p $(BIN_DIR)
 
-all: folders $(TARGET)
+all: folders $(BIN_DIR)/$(TARGET)
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
-	$(CC) -c $(CPPFLAGS) $^ -o $@ -I$(INC_DIR)
+$(OBJ_DIR)/$(TARGET).o: $(SRC_DIR)/$(TARGET).cpp $(DEPS)
+	$(CC) -c $(CPPFLAGS) $< -o $@ -I$(INC_DIR)
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/$(GFX_DIR)/%.cpp
-	$(CC) -c $(CPPFLAGS) $^ -o $@ -I$(INC_DIR)
-
-$(TARGET): $(OBJECTS)
+$(BIN_DIR)/$(TARGET): $(OBJECTS)
 	$(CC) $(CPPFLAGS) $^ -o $@ $(LDFLAGS)
 
 clean:
@@ -44,3 +43,4 @@ clean:
 # ---Vars---
 # $@ the target file
 # $^ the source files
+# $< the first source file

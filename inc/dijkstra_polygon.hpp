@@ -1,10 +1,16 @@
 #ifndef __DIJKSTRA_POLYGON_HPP__
 #define __DIJKSTRA_POLYGON_HPP__
 
+// TODO: remove when done debugging
+#include <iostream>
+
+#include <string>
 #include <cmath>
 #include <vector>
 
 namespace bfreeman {
+
+const double DBL_EPSILON = 10e-7;
 
 struct Point {
     double x;
@@ -29,6 +35,14 @@ struct Segment {
     Point p2;
 };
 
+bool is_close(const double a, const double b) {
+    return fabs(a - b) < DBL_EPSILON;
+}
+
+bool operator==(const Point& p, const Point& q) {
+    return is_close(p.x, q.x) && is_close(p.y, q.y);
+}
+
 bool is_neighbor_idx(size_t i, size_t j, const size_t size) {
     size_t temp = i > j ? i : j;
     j = j < i ? j : i;
@@ -44,12 +58,21 @@ enum Orientation {
 
 Orientation orientation(const Point& p, const Point& q, const Point& r) {
 	int value = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
-	if (value == 0) return COLINEAR;
+	if (is_close(value, 0.0)) return COLINEAR;
 	return value > 0 ? CLOCKWISE : COUNTERCLOCKWISE;
 }
 
-// does not count endpoints as instersecting
-bool check_intersect(Segment seg1, Segment seg2) {
+bool share_endpoint(const Segment& seg1, const Segment& seg2) {
+    return (
+        seg1.p1 == seg2.p1 ||
+        seg1.p1 == seg2.p2 ||
+        seg1.p2 == seg2.p1 ||
+        seg1.p2 == seg2.p2
+    );
+}
+
+bool check_intersect(const Segment& seg1, const Segment& seg2) {
+    if (share_endpoint(seg1, seg2)) return false;
     Orientation o1 = orientation(seg1.p1, seg1.p2, seg2.p1);
     Orientation o2 = orientation(seg1.p1, seg1.p2, seg2.p2);
     Orientation o3 = orientation(seg2.p1, seg2.p2, seg1.p1);
@@ -82,7 +105,13 @@ double length(const Segment& seg) {
 }
 
 void populate_interior_adjacency(const std::vector<std::vector<Point>>& polygon,
-                                 const Point& start, const Point& end, std::vector<std::vector<Edge>> adj_list) {
+                                 const Point& start, const Point& end, std::vector<std::vector<Edge>>& adj_list) {
+    Segment start_end = {start, end};
+    if (is_interior_chord(polygon, start_end)) {
+        adj_list[0].push_back((Edge){IndexPair(1, 1, true), length(start_end)});
+        adj_list[1].push_back((Edge){IndexPair(0, 0, true), length(start_end)});
+    }
+
     for (size_t i = 0; i < polygon.size(); i++) {
         for (size_t j = 0; j < polygon[i].size(); j++) {
             IndexPair idxp = {i, j};
@@ -130,6 +159,33 @@ void populate_vertex_adjacency(const std::vector<std::vector<Point>>& polygon, c
     }
 }
 
+std::vector<std::vector<Edge>> generate_adjacency_list(const std::vector<std::vector<Point>>& polygon,
+                                                       const Point& start, const Point& end) {
+    size_t vertex_count = 0;
+    for (size_t i = 0; i < polygon.size(); i++) {
+        vertex_count += polygon[i].size();
+    }
+
+    /*
+     * [0] = start
+     * [1] = end
+     * [2]...[polygon[0].size() - 1 + 2] = boundary
+     * ... = holes
+     */
+    std::vector<std::vector<Edge>> adj_list(vertex_count + 2);
+
+    populate_interior_adjacency(polygon, start, end, adj_list);
+
+    size_t adj_list_idx = 2;
+    for (size_t i = 0; i < polygon.size(); i++) {
+        for (size_t j = 0; j < polygon[i].size(); j++) {
+            populate_vertex_adjacency(polygon, start, end, adj_list[adj_list_idx++], (IndexPair){i, j});
+        }
+    }
+
+    return adj_list;
+}
+
 /*
  * Assumes that start and end are valid interior points of the polygon
  * (i.e., within its boundray and not within any holes).
@@ -152,30 +208,12 @@ void populate_vertex_adjacency(const std::vector<std::vector<Point>>& polygon, c
  *         crossing polygon holes
  */
 std::vector<Point> dijkstra_path(const std::vector<std::vector<Point>>& polygon, const Point& start, const Point& end) {
-    if (is_interior_chord(polygon, (Segment){start, end})) {
+    // TODO: bring this back at the end
+    /* if (is_interior_chord(polygon, (Segment){start, end})) {
         return std::vector<Point>(0);
-    }
-
-    size_t vertex_count = 0;
-    for (size_t i = 0; i < polygon.size(); i++) {
-        vertex_count += polygon[i].size();
-    }
-    /*
-     * [0] = start
-     * [1] = end
-     * [2]...[polygon[0].size() - 1 + 2] = boundary
-     * ... = holes
-     */
-    std::vector<std::vector<Edge>> adj_list(vertex_count + 2);
-    size_t adj_list_idx = 0;
-
-    populate_interior_adjacency(polygon, start, end, adj_list);
-
-    for (size_t i = 0; i < polygon.size(); i++) {
-        for (size_t j = 0; j < polygon[i].size(); j++) {
-            populate_vertex_adjacency(polygon, start, end, adj_list[adj_list_idx++], (IndexPair){i, j});
-        }
-    }
+    } */
+    std::vector<std::vector<Edge>> adj_list = generate_adjacency_list(polygon, start, end);
+    return std::vector<Point>(0);
 }
 
 } // namespace bfreeman
