@@ -28,7 +28,7 @@ std::string to_string(const IndexPair& idxp) {
 }
 
 std::string to_string(const Edge& edge) {
-    return to_string(edge.idxp) + ": " + std::to_string(edge.weight);
+    return to_string(edge.idxp) + ": " + std::to_string(edge.distance);
 }
 
 std::string to_string(const std::vector<std::vector<Point>>& polygon, const std::vector<std::vector<Edge>>& adj_list) {

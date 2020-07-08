@@ -50,31 +50,31 @@ bool is_close(bfreeman::Edge e1, bfreeman::Edge e2) {
 
 bool compare_al(AdjacencyList test_al, AdjacencyList true_al) {
     if (test_al.size() > true_al.size()) {
-        std::cout << "list size " << test_al.size() - true_al.size()
-                  << " too large" << std::endl;
+        std::cout << "list has " << test_al.size() - true_al.size()
+                  << " too many elements" << std::endl;
         return false;
     }
     if (test_al.size() < true_al.size()) {
-        std::cout << "list size " << true_al.size() - test_al.size()
-                  << " too small" << std::endl;
+        std::cout << "list has " << true_al.size() - test_al.size()
+                  << " too few elements" << std::endl;
         return false;
     }
     for (size_t i = 0; i < test_al.size(); i++) {
         if (test_al[i].size() > true_al[i].size()) {
-            std::cout << "sublist size (" << i << ") " << test_al.size() - true_al.size()
-                      << " too large" << std::endl;
+            std::cout << "sublist (" << i << ") has " << test_al[i].size() - true_al[i].size()
+                      << " too many elements" << std::endl;
             return false;
         }
         if (test_al[i].size() < true_al[i].size()) {
-            std::cout << "sublist size (" << i << ") " << true_al.size() - test_al.size()
-                      << " too small" << std::endl;
+            std::cout << "sublist size (" << i << ") has " << true_al[i].size() - test_al[i].size()
+                      << " too few elements" << std::endl;
             return false;
         }
     }
     for (size_t i = 0; i < test_al.size(); i++) {
         for (size_t j = 0; j < test_al[i].size(); j++) {
             if (!is_close(test_al[i][j], true_al[i][j])) {
-                std::cout << "edge at (" << i << ", " << j << ") not equivalent" << std::endl;
+                std::cout << "edge at (" << i << ", " << j << ") not correct" << std::endl;
                 return false;
             }
         }
@@ -82,11 +82,29 @@ bool compare_al(AdjacencyList test_al, AdjacencyList true_al) {
     return true;
 }
 
+void run_test(std::string name, AdjacencyList test_al, AdjacencyList true_al, unsigned short& passed, unsigned short& total) {
+    if(compare_al(test_al, true_al)) {
+            std::cout << "PASSED " << name << std::endl;
+            passed++;
+        } else {
+            std::cout << "FAILED " << name << std::endl;
+        }
+        total++;
+}
+
 int main(int argc, char** argv) {
     bool verbose = argc > 1 && std::strcmp(argv[1], "-v") == 0;
 
     unsigned short passed = 0;
     unsigned short total = 0;
+
+    /*
+     * Each adjacency list should list start, end,
+     * then the border points in winding order,
+     * then each hole in order and its points in
+     * winding order.
+     * Within each sublist, the same ordering holds.
+     */
 
     /*
      * @name unit_square_q1
@@ -147,13 +165,7 @@ int main(int argc, char** argv) {
         push(true_al[5], 0, 1, false, 1.414214);
         push(true_al[5], 0, 2, false, 1.000000);
 
-        if(compare_al(test_al, true_al)) {
-            std::cout << name << " PASSED" << std::endl;
-            passed++;
-        } else {
-            std::cout << name << " FAILED" << std::endl;
-        }
-        total++;
+        run_test(name, test_al, true_al, passed, total);
     }
     /*
      * @name unit_square_all_q
@@ -166,12 +178,55 @@ int main(int argc, char** argv) {
     {
         std::string name = "unit_sq_all_q";
         Polygon poly(1);
+
         push(poly[0], -0.5, -0.5);
         push(poly[0], -0.5,  0.5);
         push(poly[0],  0.5,  0.5);
         push(poly[0],  0.5, -0.5);
+
         PointPair se = pp(-0.25, -0.25, 0.25, 0.25);
         if (verbose) print_info(name, poly, se);
+
+        AdjacencyList test_al = bfreeman::generate_adjacency_list(poly, se.start, se.end);
+        AdjacencyList true_al(6);
+
+        push(true_al[0], 1, 1,  true, 0.707107);
+        push(true_al[0], 0, 0, false, 0.353553);
+        push(true_al[0], 0, 1, false, 0.790569);
+        push(true_al[0], 0, 2, false, 1.060660);
+        push(true_al[0], 0, 3, false, 0.790569);
+
+        push(true_al[1], 0, 0,  true, 0.707107);
+        push(true_al[1], 0, 0, false, 1.060660);
+        push(true_al[1], 0, 1, false, 0.790569);
+        push(true_al[1], 0, 2, false, 0.353553);
+        push(true_al[1], 0, 3, false, 0.790569);
+
+        push(true_al[2], 0, 0,  true, 0.353553);
+        push(true_al[2], 1, 1,  true, 1.060660);
+        push(true_al[2], 0, 1, false, 1.000000);
+        push(true_al[2], 0, 2, false, 1.414214);
+        push(true_al[2], 0, 3, false, 1.000000);
+
+        push(true_al[3], 0, 0,  true, 0.790569);
+        push(true_al[3], 1, 1,  true, 0.790569);
+        push(true_al[3], 0, 0, false, 1.000000);
+        push(true_al[3], 0, 2, false, 1.000000);
+        push(true_al[3], 0, 3, false, 1.414214);
+
+        push(true_al[4], 0, 0,  true, 1.060660);
+        push(true_al[4], 1, 1,  true, 0.353553);
+        push(true_al[4], 0, 0, false, 1.414214);
+        push(true_al[4], 0, 1, false, 1.000000);
+        push(true_al[4], 0, 3, false, 1.000000);
+
+        push(true_al[5], 0, 0,  true, 0.790569);
+        push(true_al[5], 1, 1,  true, 0.790569);
+        push(true_al[5], 0, 0, false, 1.000000);
+        push(true_al[5], 0, 1, false, 1.414214);
+        push(true_al[5], 0, 2, false, 1.000000);
+
+        run_test(name, test_al, true_al, passed, total);
     }
     /*
      * @name sq_in_sq
@@ -184,6 +239,7 @@ int main(int argc, char** argv) {
     {
         std::string name = "sq_in_sq";
         Polygon poly(2);
+
         push(poly[0], -0.5, -0.5);
         push(poly[0], -0.5,  0.5);
         push(poly[0],  0.5,  0.5);
@@ -192,9 +248,88 @@ int main(int argc, char** argv) {
         push(poly[1],  0.1, -0.1);
         push(poly[1],  0.1,  0.1);
         push(poly[1], -0.1,  0.1);
+
         PointPair se = pp(-0.4, -0.4, 0.4, 0.4);
         if (verbose) print_info(name, poly, se);
 
+        AdjacencyList test_al = bfreeman::generate_adjacency_list(poly, se.start, se.end);
+        AdjacencyList true_al(10);
+
+        push(true_al[0], 0, 0, false, 0.141421);
+        push(true_al[0], 0, 1, false, 0.905539);
+        push(true_al[0], 0, 3, false, 0.905539);
+        push(true_al[0], 1, 0, false, 0.424264);
+        push(true_al[0], 1, 1, false, 0.583095);
+        push(true_al[0], 1, 3, false, 0.583095);
+
+        push(true_al[1], 0, 1, false, 0.905539);
+        push(true_al[1], 0, 2, false, 0.141421);
+        push(true_al[1], 0, 3, false, 0.905539);
+        push(true_al[1], 1, 1, false, 0.583095);
+        push(true_al[1], 1, 2, false, 0.424264);
+        push(true_al[1], 1, 3, false, 0.583095);
+
+        push(true_al[2], 0, 0,  true, 0.141421);
+        push(true_al[2], 0, 1, false, 1.000000);
+        push(true_al[2], 0, 3, false, 1.000000);
+        push(true_al[2], 1, 0, false, 0.565685);
+        push(true_al[2], 1, 1, false, 0.721110);
+        push(true_al[2], 1, 3, false, 0.721110);
+
+        push(true_al[3], 0, 0,  true, 0.905539);
+        push(true_al[3], 1, 1,  true, 0.905539);
+        push(true_al[3], 0, 0, false, 1.000000);
+        push(true_al[3], 0, 2, false, 1.000000);
+        push(true_al[3], 1, 0, false, 0.721110);
+        push(true_al[3], 1, 2, false, 0.721110);
+        push(true_al[3], 1, 3, false, 0.565685);
+
+        push(true_al[4], 1, 1,  true, 0.141421);
+        push(true_al[4], 0, 1, false, 1.000000);
+        push(true_al[4], 0, 3, false, 1.000000);
+        push(true_al[4], 1, 1, false, 0.721110);
+        push(true_al[4], 1, 2, false, 0.565685);
+        push(true_al[4], 1, 3, false, 0.721110);
+
+        push(true_al[5], 0, 0,  true, 0.905539);
+        push(true_al[5], 1, 1,  true, 0.905539);
+        push(true_al[5], 0, 0, false, 1.000000);
+        push(true_al[5], 0, 2, false, 1.000000);
+        push(true_al[5], 1, 0, false, 0.721110);
+        push(true_al[5], 1, 1, false, 0.565685);
+        push(true_al[5], 1, 2, false, 0.721110);
+
+        push(true_al[6], 0, 0,  true, 0.424264);
+        push(true_al[6], 0, 0, false, 0.565685);
+        push(true_al[6], 0, 1, false, 0.721110);
+        push(true_al[6], 0, 3, false, 0.721110);
+        push(true_al[6], 1, 1, false, 0.200000);
+        push(true_al[6], 1, 3, false, 0.200000);
+
+        push(true_al[7], 0, 0,  true, 0.583095);
+        push(true_al[7], 1, 1,  true, 0.583095);
+        push(true_al[7], 0, 0, false, 0.721110);
+        push(true_al[7], 0, 2, false, 0.721110);
+        push(true_al[7], 0, 3, false, 0.565685);
+        push(true_al[7], 1, 0, false, 0.200000);
+        push(true_al[7], 1, 2, false, 0.200000);
+
+        push(true_al[8], 1, 1,  true, 0.424264);
+        push(true_al[8], 0, 1, false, 0.721110);
+        push(true_al[8], 0, 2, false, 0.565685);
+        push(true_al[8], 0, 3, false, 0.721110);
+        push(true_al[8], 1, 1, false, 0.200000);
+        push(true_al[8], 1, 3, false, 0.200000);
+
+        push(true_al[9], 0, 0,  true, 0.583095);
+        push(true_al[9], 1, 1,  true, 0.583095);
+        push(true_al[9], 0, 0, false, 0.721110);
+        push(true_al[9], 0, 1, false, 0.565685);
+        push(true_al[9], 0, 2, false, 0.721110);
+        push(true_al[9], 1, 0, false, 0.200000);
+        push(true_al[9], 1, 2, false, 0.200000);
+
+        run_test(name, test_al, true_al, passed, total);
     }
     /*
      * @name mountain
@@ -208,19 +343,59 @@ int main(int argc, char** argv) {
     // counterclockwise winding
     {
         std::string name = "mountain";
-        Polygon ploy(1);
-        push(ploy[0], 0, 0);
-        push(ploy[0], 6, 0);
-        push(ploy[0], 4, 3);
-        push(ploy[0], 3, 1.5);
-        push(ploy[0], 2, 3);
+        Polygon poly(1);
+
+        push(poly[0], 0, 0);
+        push(poly[0], 6, 0);
+        push(poly[0], 4, 3);
+        push(poly[0], 3, 1.5);
+        push(poly[0], 2, 3);
+
         PointPair se = pp(2, 2, 4, 2);
-        if (verbose) print_info(name, ploy, se);
+        if (verbose) print_info(name, poly, se);
+
+        AdjacencyList test_al = bfreeman::generate_adjacency_list(poly, se.start, se.end);
+        AdjacencyList true_al(7);
+
+        push(true_al[0], 0, 0, false, 2.828427);
+        push(true_al[0], 0, 3, false, 1.118033);
+        push(true_al[0], 0, 4, false, 1.000000);
+
+        push(true_al[1], 0, 1, false, 2.828427);
+        push(true_al[1], 0, 2, false, 1.000000);
+        push(true_al[1], 0, 3, false, 1.118033);
+
+        push(true_al[2], 0, 0,  true, 2.828427);
+        push(true_al[2], 0, 1, false, 6.000000);
+        push(true_al[2], 0, 3, false, 3.354101);
+        push(true_al[2], 0, 4, false, 3.605551);
+
+        push(true_al[3], 1, 1,  true, 2.828427);
+        push(true_al[3], 0, 0, false, 6.000000);
+        push(true_al[3], 0, 2, false, 3.605551);
+        push(true_al[3], 0, 3, false, 3.354101);
+
+        push(true_al[4], 1, 1,  true, 1.000000);
+        push(true_al[4], 0, 1, false, 3.605551);
+        push(true_al[4], 0, 3, false, 1.802775);
+
+        push(true_al[5], 0, 0,  true, 1.118033);
+        push(true_al[5], 1, 1,  true, 1.118033);
+        push(true_al[5], 0, 0, false, 3.354101);
+        push(true_al[5], 0, 1, false, 3.354101);
+        push(true_al[5], 0, 2, false, 1.802775);
+        push(true_al[5], 0, 4, false, 1.802775);
+
+        push(true_al[6], 0, 0,  true, 1.000000);
+        push(true_al[6], 0, 0, false, 3.605551);
+        push(true_al[6], 0, 3, false, 1.802775);
+
+        run_test(name, test_al, true_al, passed, total);
     }
 
     float percent = 100.0f * passed / total;
     std::cout << passed << " PASSED out of " << total << " (" << std::fixed
-              << std::setprecision(2) << percent << "%)" << std::endl;
+              << std::setprecision(1) << percent << "%)" << std::endl;
 
     return 0;
 }
