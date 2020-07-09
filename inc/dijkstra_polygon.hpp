@@ -10,6 +10,11 @@ struct Point {
     double y;
 };
 
+struct Segment {
+    Point p1;
+    Point p2;
+};
+
 struct IndexPair {
     size_t i;
     size_t j;
@@ -21,11 +26,6 @@ struct IndexPair {
 struct Edge {
     IndexPair idxp;
     double distance;
-};
-
-struct Segment {
-    Point p1;
-    Point p2;
 };
 
 enum Orientation {
@@ -48,21 +48,32 @@ bool on_segment(const Segment& seg, const Point& point);
 
 bool check_intersect(const Segment& seg1, const Segment& seg2);
 
-// assumes !same_hole_non_neighbor
 bool is_interior_chord(const std::vector<std::vector<Point>>& polygon, const Segment& seg);
 
 double sq(const double d);
 
 double length(const Segment& seg);
 
-void populate_interior_adjacency(const std::vector<std::vector<Point>>& polygon,
-                                 const Point& start, const Point& end, std::vector<std::vector<Edge>>& adj_list);
+void populate_interior_adjacency(
+    const std::vector<std::vector<Point>>& polygon,
+    const Point& start,
+    const Point& end,
+    std::vector<std::vector<Edge>>& adj_list
+);
 
-void populate_vertex_adjacency(const std::vector<std::vector<Point>>& polygon, const Point& start, const Point& end,
-                        std::vector<Edge>& adj_list_row, const IndexPair idxp);
+void populate_vertex_adjacency(
+    const std::vector<std::vector<Point>>& polygon,
+    const Point& start,
+    const Point& end,
+    std::vector<Edge>& adj_list_row,
+    const IndexPair idxp
+);
 
-std::vector<std::vector<Edge>> generate_adjacency_list(const std::vector<std::vector<Point>>& polygon,
-                                                       const Point& start, const Point& end);
+std::vector<std::vector<Edge>> generate_adjacency_list(
+    const std::vector<std::vector<Point>>& polygon,
+    const Point& start,
+    const Point& end
+);
 
 /*
  * Assumes that start and end are valid interior points of the polygon
@@ -85,7 +96,11 @@ std::vector<std::vector<Edge>> generate_adjacency_list(const std::vector<std::ve
  *         distance without leaving the polygon boundary or
  *         crossing polygon holes
  */
-std::vector<Point> dijkstra_path(const std::vector<std::vector<Point>>& polygon, const Point& start, const Point& end);
+std::vector<Point> dijkstra_path(
+    const std::vector<std::vector<Point>>& polygon,
+    const Point& start,
+    const Point& end
+);
 
 } // namespace bfreeman
 

@@ -8,6 +8,15 @@ void pad(std::string& str, const size_t width) {
     }
 }
 
+std::string to_string(const Point& point) {
+    return "(" + std::to_string(point.x) + ", " +
+                 std::to_string(point.y) + ")";
+}
+
+std::string to_string(const Segment& segment) {
+    return to_string(segment.p1) + "-" + to_string(segment.p2);
+}
+
 std::string to_string(const IndexPair& idxp) {
     std::string str;
     if (idxp.interior) {
@@ -53,15 +62,6 @@ std::string to_string(const std::vector<std::vector<Point>>& polygon, const std:
 
     str += "}";
     return str;
-}
-
-std::string to_string(const Point& point) {
-    return "(" + std::to_string(point.x) + ", " +
-                 std::to_string(point.y) + ")";
-}
-
-std::string to_string(const Segment& seg) {
-    return to_string(seg.p1) + "-" + to_string(seg.p2);
 }
 
 std::string to_string(const std::vector<std::vector<Point>>& polygon) {

@@ -8,15 +8,15 @@ namespace bfreeman {
 
 void pad(std::string& str, const size_t width);
 
+std::string to_string(const Point& point);
+
+std::string to_string(const Segment& segment);
+
 std::string to_string(const IndexPair& idxp);
 
 std::string to_string(const Edge& edge);
 
 std::string to_string(const std::vector<std::vector<Point>>& polygon, const std::vector<std::vector<Edge>>& adj_list);
-
-std::string to_string(const Point& point);
-
-std::string to_string(const Segment& seg);
 
 std::string to_string(const std::vector<std::vector<Point>>& polygon);
 

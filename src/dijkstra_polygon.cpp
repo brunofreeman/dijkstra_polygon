@@ -2,8 +2,8 @@
 
 // TODO: remove when done debugging
 #include <iostream>
-
 #include <string>
+
 #include <cmath>
 
 namespace bfreeman {
@@ -108,8 +108,12 @@ double length(const Segment& seg) {
     );
 }
 
-void populate_interior_adjacency(const std::vector<std::vector<Point>>& polygon,
-                                 const Point& start, const Point& end, std::vector<std::vector<Edge>>& adj_list) {
+void populate_interior_adjacency(
+    const std::vector<std::vector<Point>>& polygon,
+    const Point& start,
+    const Point& end,
+    std::vector<std::vector<Edge>>& adj_list) {
+
     Segment start_end = {start, end};
     if (is_interior_chord(polygon, start_end)) {
         adj_list[0].push_back((Edge){IndexPair(1, 1, true), length(start_end)});
@@ -134,8 +138,13 @@ void populate_interior_adjacency(const std::vector<std::vector<Point>>& polygon,
     }
 }
 
-void populate_vertex_adjacency(const std::vector<std::vector<Point>>& polygon, const Point& start, const Point& end,
-                        std::vector<Edge>& adj_list_row, const IndexPair idxp) {
+void populate_vertex_adjacency(
+    const std::vector<std::vector<Point>>& polygon,
+    const Point& start,
+    const Point& end,
+    std::vector<Edge>& adj_list_row,
+    const IndexPair idxp) {
+
     Point vertex = polygon[idxp.i][idxp.j];
 
     Segment to_start = {start, vertex};
@@ -167,8 +176,11 @@ void populate_vertex_adjacency(const std::vector<std::vector<Point>>& polygon, c
     }
 }
 
-std::vector<std::vector<Edge>> generate_adjacency_list(const std::vector<std::vector<Point>>& polygon,
-                                                       const Point& start, const Point& end) {
+std::vector<std::vector<Edge>> generate_adjacency_list(
+    const std::vector<std::vector<Point>>& polygon,
+    const Point& start,
+    const Point& end) {
+
     size_t vertex_count = 0;
     for (size_t i = 0; i < polygon.size(); i++) {
         vertex_count += polygon[i].size();
@@ -194,7 +206,11 @@ std::vector<std::vector<Edge>> generate_adjacency_list(const std::vector<std::ve
     return adj_list;
 }
 
-std::vector<Point> dijkstra_path(const std::vector<std::vector<Point>>& polygon, const Point& start, const Point& end) {
+std::vector<Point> dijkstra_path(
+    const std::vector<std::vector<Point>>& polygon,
+    const Point& start,
+    const Point& end) {
+        
     // TODO: bring this back at the end
     /* if (is_interior_chord(polygon, (Segment){start, end})) {
         return std::vector<Point>(0);

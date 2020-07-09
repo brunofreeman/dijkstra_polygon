@@ -1,35 +1,14 @@
 #include <iostream>
 #include <iomanip>
 #include "test_util.hpp"
+#include "dijkstra_polygon_to_string.hpp"
 
-bfreeman::Point p(double x, double y) {
-    return (bfreeman::Point){x, y};
+void push_point(std::vector<bfreeman::Point>& vec, double x, double y) {
+    vec.push_back((bfreeman::Point){x, y});
 }
 
-PointPair pp(double x1, double y1, double x2, double y2) {
-    return (PointPair){p(x1, y1), p(x2, y2)};
-}
-
-bfreeman::Edge e(size_t i, size_t j, bool interior, double dist) {
-    return (bfreeman::Edge){(bfreeman::IndexPair){i, j ,interior}, dist};
-}
-
-void push(std::vector<bfreeman::Point>& vec, double x, double y) {
-    vec.push_back(p(x, y));
-}
-
-void push(std::vector<bfreeman::Edge>& vec, size_t i, size_t j, bool interior, double dist) {
-    vec.push_back(e(i, j, interior, dist));
-}
-
-void print_info(std::string label, const Polygon& polygon, const PointPair& se) {
-    std::cout << label + ":" << std::endl;
-    std::cout << bfreeman::to_string(polygon) << std::endl;
-    std::cout << bfreeman::to_string(polygon, bfreeman::generate_adjacency_list(polygon, se.start, se.end)) << std::endl;
-    for (size_t i = 0; i < 80; i++) {
-        std::cout << '-';
-    }
-    std::cout << std::endl;
+void push_edge(std::vector<bfreeman::Edge>& vec, size_t i, size_t j, bool interior, double distance) {
+    vec.push_back((bfreeman::Edge){(bfreeman::IndexPair){i, j, interior}, distance});
 }
 
 bool is_close(bfreeman::Edge e1, bfreeman::Edge e2) {
@@ -82,6 +61,16 @@ void run_test(std::string name, AdjacencyList test_al, AdjacencyList true_al, un
         } else {
             std::cout << "FAILED " << name << std::endl;
         }
+}
+
+void print_info(std::string label, const Polygon& polygon, const PointPair& se) {
+    std::cout << label + ":" << std::endl;
+    std::cout << bfreeman::to_string(polygon) << std::endl;
+    std::cout << bfreeman::to_string(polygon, bfreeman::generate_adjacency_list(polygon, se.start, se.end)) << std::endl;
+    for (size_t i = 0; i < 80; i++) {
+        std::cout << '-';
+    }
+    std::cout << std::endl;
 }
 
 void print_test_report(const size_t passed_tests, const size_t total_tests) {

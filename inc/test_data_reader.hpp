@@ -1,8 +1,6 @@
 #ifndef __TEST_DATA_READER_HPP__
 #define __TEST_DATA_READER_HPP__
 
-#include "test_util.hpp"
-
 enum ReadType {
     SHAPE = 0,
     START_END = 1,
