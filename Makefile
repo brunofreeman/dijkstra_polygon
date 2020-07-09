@@ -11,18 +11,17 @@ SOURCES = $(wildcard $(SRC_DIR)/*.cpp)
 OBJECTS = $(subst $(SRC_DIR), $(OBJ_DIR), $(SOURCES:.cpp=.o))
 
 TARGET = tests
-DEPS = $(INC_DIR)/dijkstra_polygon.hpp $(INC_DIR)/dijkstra_polygon_to_string.hpp
 
 folders:
 	mkdir -p $(INC_DIR) & mkdir -p $(SRC_DIR) & mkdir -p $(OBJ_DIR) & mkdir -p $(BIN_DIR)
 
 all: folders $(BIN_DIR)/$(TARGET)
 
-$(OBJ_DIR)/$(TARGET).o: $(SRC_DIR)/$(TARGET).cpp $(DEPS)
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CC) -c $(CPPFLAGS) $< -o $@ -I$(INC_DIR)
 
 $(BIN_DIR)/$(TARGET): $(OBJECTS)
-	$(CC) $(CPPFLAGS) $^ -o $@ $(LDFLAGS)
+	$(CC) $(CPPFLAGS) $^ -o $@ $(LDFLAGS) -I$(INC_DIR)
 
 clean:
 	rm -f $(OBJ_DIR)/*.o $(BIN_DIR)/*
