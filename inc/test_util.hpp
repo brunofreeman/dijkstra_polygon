@@ -16,11 +16,18 @@ void push_point(std::vector<bfreeman::Point>& vec, double x, double y);
 
 void push_edge(std::vector<bfreeman::Edge>& vec, size_t i, size_t j, bool interior, double distance);
 
-bool is_close(bfreeman::Edge e1, bfreeman::Edge e2);
+bool is_close(const bfreeman::Edge& e1, const bfreeman::Edge& e2);
 
 bool compare_al(const AdjacencyList& test_al, const AdjacencyList& true_al);
 
-void run_test(std::string name, AdjacencyList test_al, AdjacencyList true_al, unsigned short& passed, const bool verbose);
+void run_test(
+    std::string name,
+    const Polygon& polygon,
+    const AdjacencyList& test_al,
+    const AdjacencyList& true_al,
+    unsigned short& passed_tests,
+    const bool verbose
+);
 
 void print_info(std::string label, const Polygon& polygon, const PointPair& se);
 

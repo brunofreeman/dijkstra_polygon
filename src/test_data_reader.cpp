@@ -130,7 +130,7 @@ void* read_test_data(const ReadType type, const std::string& name, const size_t 
                 push_point((*polygon)[shape_idx], x, y);
                 break;
             case START_END:
-                y2 = std::stod(datum);
+                y2 = std::stod(line);
                 *start_end = {{x1, y1}, {x2, y2}};
                 break;
             case ADJACENCY_LIST:

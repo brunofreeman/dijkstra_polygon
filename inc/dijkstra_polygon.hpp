@@ -28,45 +28,15 @@ struct Edge {
     double distance;
 };
 
-enum Orientation {
-    COLINEAR = 0,
-    COUNTERCLOCKWISE = 1,
-    CLOCKWISE = 2
-};
-
-bool is_close(const double a, const double b);
-
-bool operator==(const Point& p, const Point& q);
-
-bool is_neighbor_idx(size_t i, size_t j, const size_t size);
-
-Orientation orientation(const Point& p, const Point& q, const Point& r);
-
-bool share_endpoint(const Segment& seg1, const Segment& seg2);
-
-bool on_segment(const Segment& seg, const Point& point);
-
-bool check_intersect(const Segment& seg1, const Segment& seg2);
-
-bool is_interior_chord(const std::vector<std::vector<Point>>& polygon, const Segment& seg);
-
-double sq(const double d);
-
-double length(const Segment& seg);
-
-void populate_interior_adjacency(
+bool is_interior_chord_vertex_vertex(
     const std::vector<std::vector<Point>>& polygon,
-    const Point& start,
-    const Point& end,
-    std::vector<std::vector<Edge>>& adj_list
+    const IndexPair& from,
+    const IndexPair& to
 );
 
-void populate_vertex_adjacency(
+bool is_interior_chord_start_or_end(
     const std::vector<std::vector<Point>>& polygon,
-    const Point& start,
-    const Point& end,
-    std::vector<Edge>& adj_list_row,
-    const IndexPair idxp
+    const Segment& segment
 );
 
 std::vector<std::vector<Edge>> generate_adjacency_list(

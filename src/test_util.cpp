@@ -1,7 +1,30 @@
 #include <iostream>
 #include <iomanip>
+#include <cmath>
 #include "test_util.hpp"
 #include "dijkstra_polygon_to_string.hpp"
+
+const double DBL_EPSILON = 10e-7;
+const unsigned char SEPARATION_LINE_LENGTH = 100;
+
+void print_label(std::string label) {
+    std::cout << label + ":" << std::endl;
+}
+
+void print_polygon(const Polygon& polygon) {
+    std::cout << bfreeman::to_string(polygon) << std::endl;
+}
+
+void print_adjacency_list(const Polygon& polygon, const AdjacencyList& adjacency_list) {
+    std::cout << bfreeman::to_string(polygon, adjacency_list) << std::endl;
+}
+
+void print_seperation_line() {
+    for (size_t i = 0; i < SEPARATION_LINE_LENGTH; i++) {
+        std::cout << '-';
+    }
+    std::cout << std::endl;
+}
 
 void push_point(std::vector<bfreeman::Point>& vec, double x, double y) {
     vec.push_back((bfreeman::Point){x, y});
@@ -11,11 +34,15 @@ void push_edge(std::vector<bfreeman::Edge>& vec, size_t i, size_t j, bool interi
     vec.push_back((bfreeman::Edge){(bfreeman::IndexPair){i, j, interior}, distance});
 }
 
-bool is_close(bfreeman::Edge e1, bfreeman::Edge e2) {
+bool is_close(const double a, const double b) {
+    return fabs(a - b) < DBL_EPSILON;
+}
+
+bool is_close(const bfreeman::Edge& e1, const bfreeman::Edge& e2) {
     return e1.idxp.i == e2.idxp.i &&
            e1.idxp.j == e2.idxp.j &&
            e1.idxp.interior == e1.idxp.interior &&
-           bfreeman::is_close(e1.distance, e2.distance);
+           is_close(e1.distance, e2.distance);
 }
 
 bool compare_al(const AdjacencyList& test_al, const AdjacencyList& true_al) {
@@ -36,7 +63,7 @@ bool compare_al(const AdjacencyList& test_al, const AdjacencyList& true_al) {
             return false;
         }
         if (test_al[i].size() < true_al[i].size()) {
-            std::cout << "sublist size " << i << " has " << true_al[i].size() - test_al[i].size()
+            std::cout << "sublist " << i << " has " << true_al[i].size() - test_al[i].size()
                       << " too few elements: ";
             return false;
         }
@@ -54,23 +81,29 @@ bool compare_al(const AdjacencyList& test_al, const AdjacencyList& true_al) {
     return true;
 }
 
-void run_test(std::string name, AdjacencyList test_al, AdjacencyList true_al, unsigned short& passed, const bool verbose) {
-    if(compare_al(test_al, true_al)) {
-            std::cout << "PASSED " << name << std::endl;
-            passed++;
-        } else {
-            std::cout << "FAILED " << name << std::endl;
-        }
-}
-
-void print_info(std::string label, const Polygon& polygon, const PointPair& se) {
-    std::cout << label + ":" << std::endl;
-    std::cout << bfreeman::to_string(polygon) << std::endl;
-    std::cout << bfreeman::to_string(polygon, bfreeman::generate_adjacency_list(polygon, se.start, se.end)) << std::endl;
-    for (size_t i = 0; i < 80; i++) {
-        std::cout << '-';
+void run_test(
+    std::string name,
+    const Polygon& polygon,
+    const AdjacencyList& test_al,
+    const AdjacencyList& true_al,
+    unsigned short& passed_tests,
+    const bool verbose) {
+    
+    bool passed = compare_al(test_al, true_al);
+    if (verbose || !passed) {
+        print_label(name);
+        print_polygon(polygon);
+        print_label("Generated adjacency list");
+        print_adjacency_list(polygon, test_al);
+        print_label("Correct adjacency list");
+        print_adjacency_list(polygon, true_al);
     }
-    std::cout << std::endl;
+    if (passed) {
+        std::cout << "PASSED " << name << std::endl;
+        passed_tests++;
+    } else {
+        std::cout << "FAILED " << name << std::endl;
+    }
 }
 
 void print_test_report(const size_t passed_tests, const size_t total_tests) {

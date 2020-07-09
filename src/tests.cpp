@@ -1,4 +1,9 @@
+#include <vector>
+#include <string>
+#include "dijkstra_polygon.hpp"
+#include "test_util.hpp"
 #include "test_data_reader.hpp"
+
 
 int main(int argc, char** argv) {
     bool verbose = argc > 1 && std::strcmp(argv[1], "-v") == 0;
@@ -77,7 +82,7 @@ int main(int argc, char** argv) {
         AdjacencyList test_al = bfreeman::generate_adjacency_list(*polygon, start_end->start, start_end->end);
         AdjacencyList* true_al = (AdjacencyList*)read_test_data(ADJACENCY_LIST, names[i], adjacency_list_sizes[i]);
 
-        run_test(names[i], test_al, *true_al, passed_tests, verbose);
+        run_test(names[i], *polygon, test_al, *true_al, passed_tests, verbose);
 
         delete polygon;
         delete start_end;

@@ -1,4 +1,5 @@
 #include "dijkstra_polygon.hpp"
+#include "dijkstra_polygon_to_string.hpp"
 
 // TODO: remove when done debugging
 #include <iostream>
@@ -10,12 +11,34 @@ namespace bfreeman {
 
 const double DBL_EPSILON = 10e-7;
 
+enum Orientation {
+    COLINEAR = 0,
+    COUNTERCLOCKWISE = 1,
+    CLOCKWISE = 2
+};
+
 bool is_close(const double a, const double b) {
     return fabs(a - b) < DBL_EPSILON;
 }
 
 bool operator==(const Point& p, const Point& q) {
     return is_close(p.x, q.x) && is_close(p.y, q.y);
+}
+
+void operator-=(Point& p, const Point& q) {
+    p.x -= q.x;
+    p.y -= q.y;
+}
+
+double sq(const double d) {
+    return d*d;
+}
+
+double length(const Segment& seg) {
+    return sqrt(
+        sq(seg.p1.x - seg.p2.x) +
+        sq(seg.p1.y - seg.p2.y)
+    );
 }
 
 bool is_neighbor_idx(size_t i, size_t j, const size_t size) {
@@ -44,15 +67,15 @@ bool share_endpoint(const Segment& seg1, const Segment& seg2) {
     );
 }
 
-bool on_segment(const Segment& seg, const Point& point) {
+bool on_segment(const Segment& seg, const Point& p) {
     auto max = [](double a, double b) {
         return a > b ? a : b;
     };
     auto min = [](double a, double b) {
         return a < b ? a : b;
     };
-	return (point.x <= max(seg.p1.x, seg.p2.x) && point.x >= min(seg.p1.x, seg.p2.x) &&
-            point.y <= max(seg.p1.y, seg.p2.y) && point.y >= min(seg.p1.y, seg.p2.y));
+	return (p.x <= max(seg.p1.x, seg.p2.x) && p.x >= min(seg.p1.x, seg.p2.x) &&
+            p.y <= max(seg.p1.y, seg.p2.y) && p.y >= min(seg.p1.y, seg.p2.y));
 }
 
 bool check_intersect(const Segment& seg1, const Segment& seg2) {
@@ -61,7 +84,7 @@ bool check_intersect(const Segment& seg1, const Segment& seg2) {
     Orientation o2 = orientation(seg1.p1, seg1.p2, seg2.p2);
     Orientation o3 = orientation(seg2.p1, seg2.p2, seg1.p1);
     Orientation o4 = orientation(seg2.p1, seg2.p2, seg1.p2);
-    /* if (seg1.p2 == (Point){0.1, -0.1}) {
+    /* if (seg1.p2 == (Point){4, 2}) {
         std::cout << "o1: " + std::to_string(o1) << ", "
                   << "o2: " + std::to_string(o2) << ", "
                   << "o3: " + std::to_string(o3) << ", "
@@ -78,16 +101,89 @@ bool check_intersect(const Segment& seg1, const Segment& seg2) {
            (o4 == COLINEAR && on_segment(seg2, seg1.p2));
 }
 
-// std::string to_string(const Segment& seg);
+double get_relative_angle(const Point& origin, Point angle_point) {
+    angle_point -= origin;
+    if (is_close(angle_point.x, 0)) {
+        if (angle_point.y > 0) {
+            return M_PI / 2;
+        } else {
+            return 3 * M_PI / 2;
+        }
+    }
+    if (is_close(angle_point.y, 0)) {
+        if (angle_point.x > 0) {
+            return 2 * M_PI;
+        } else {
+            return M_PI;
+        }
+    }
 
-// assumes !same_hole_non_neighbor
-bool is_interior_chord(const std::vector<std::vector<Point>>& polygon, const Segment& seg) {
+    if (angle_point.x < 0 && angle_point.y < 0) {
+        angle_point.x *= -1;
+        angle_point.y *= -1;
+        return M_PI + atan(angle_point.y / angle_point.x);
+    } else if (angle_point.x < 0) {
+        angle_point.x *= -1;
+        return M_PI - atan(angle_point.y / angle_point.x);
+    } else if (angle_point.y < 0) {
+        angle_point.y *= -1;
+        return 2 * M_PI - atan(angle_point.y / angle_point.x);
+    } else {
+        return atan(angle_point.y / angle_point.x);
+    }
+}
+
+// assumes a clockwise winding
+Point get_angle_range(const std::vector<std::vector<Point>>& polygon, const IndexPair& idxp) {
+    Point point_prev = polygon[idxp.i][(idxp.j == 0 ? polygon[idxp.i].size() : idxp.j) - 1];
+    Point point = polygon[idxp.i][idxp.j];
+    Point point_next = polygon[idxp.i][idxp.j == polygon[idxp.i].size() - 1 ? 0 : idxp.j + 1];
+
+    double angle_prev = get_relative_angle(point, point_prev);
+    double angle_next = get_relative_angle(point, point_next);
+
+    if (idxp.i > 0) {
+        double temp = angle_next;
+        angle_next = angle_prev;
+        angle_prev = temp;
+    }
+    if (angle_next < angle_prev) {
+        return (Point){angle_next, angle_prev};
+    } else {
+        return (Point){angle_next - 2 * M_PI, angle_prev};
+    }
+}
+
+bool pointing_inside(Segment segment, const Point& angle_range) {
+    double angle = get_relative_angle(segment.p1, segment.p2);
+    if (angle_range.x <= angle && angle <= angle_range.y) return true;
+    angle -= 2 * M_PI;
+    if (angle_range.x <= angle && angle <= angle_range.y) return true;
+    return false;
+}
+
+bool is_interior_chord_vertex_vertex(
+    const std::vector<std::vector<Point>>& polygon,
+    const IndexPair& from,
+    const IndexPair& to) {
+    
+    Segment segment = {polygon[from.i][from.j], polygon[to.i][to.j]};
+    Point angle_range = get_angle_range(polygon, from);
+    if (!pointing_inside(segment, angle_range)) return false;
+
+    return is_interior_chord_start_or_end(polygon, segment);
+}
+
+bool is_interior_chord_start_or_end(
+    const std::vector<std::vector<Point>>& polygon,
+    const Segment& segment) {
+
     for (size_t i = 0; i < polygon.size(); i++) {
         size_t curr_idx = 0;
         do {
             size_t next_idx = (curr_idx + 1) % polygon[i].size();
             Segment seg_other = {polygon[i][curr_idx], polygon[i][next_idx]};
-            if (check_intersect(seg, seg_other)) {
+            if (check_intersect(segment, seg_other)) {
                 // std::cout << to_string(seg) << " intersects " << to_string(seg_other) << std::endl;
                 return false;
             }
@@ -97,25 +193,15 @@ bool is_interior_chord(const std::vector<std::vector<Point>>& polygon, const Seg
     return true;
 }
 
-double sq(const double d) {
-    return d*d;
-}
-
-double length(const Segment& seg) {
-    return sqrt(
-        sq(seg.p1.x - seg.p2.x) +
-        sq(seg.p1.y - seg.p2.y)
-    );
-}
-
 void populate_interior_adjacency(
     const std::vector<std::vector<Point>>& polygon,
     const Point& start,
     const Point& end,
     std::vector<std::vector<Edge>>& adj_list) {
 
+    // TODO: should be guarded against initially
     Segment start_end = {start, end};
-    if (is_interior_chord(polygon, start_end)) {
+    if (is_interior_chord_start_or_end(polygon, start_end)) {
         adj_list[0].push_back((Edge){IndexPair(1, 1, true), length(start_end)});
         adj_list[1].push_back((Edge){IndexPair(0, 0, true), length(start_end)});
     }
@@ -127,11 +213,11 @@ void populate_interior_adjacency(
             Segment seg_start = {start, vertex};
             Segment seg_end = {end, vertex};
 
-            if (is_interior_chord(polygon, seg_start)) {
+            if (is_interior_chord_start_or_end(polygon, seg_start)) {
                 adj_list[0].push_back((Edge){idxp, length(seg_start)});
             }
 
-            if (is_interior_chord(polygon, seg_end)) {
+            if (is_interior_chord_start_or_end(polygon, seg_end)) {
                 adj_list[1].push_back((Edge){idxp, length(seg_end)});
             }
         }
@@ -147,13 +233,14 @@ void populate_vertex_adjacency(
 
     Point vertex = polygon[idxp.i][idxp.j];
 
+
     Segment to_start = {start, vertex};
-    if (is_interior_chord(polygon, to_start)) {
+    if (is_interior_chord_start_or_end(polygon, to_start)) {
         adj_list_row.push_back((Edge){IndexPair(0, 0, true), length(to_start)});
     }
 
     Segment to_end = {end, vertex};
-    if (is_interior_chord(polygon, to_end)) {
+    if (is_interior_chord_start_or_end(polygon, to_end)) {
         adj_list_row.push_back((Edge){IndexPair(1, 1, true), length(to_end)});
     }
 
@@ -163,14 +250,13 @@ void populate_vertex_adjacency(
 
             IndexPair idxp_other = {i, j};
             Point vertex_other = polygon[idxp_other.i][idxp_other.j];
-            Segment seg = {vertex, vertex_other};
+            Segment segment = {vertex, vertex_other};
 
-            bool same_poly = i == idxp.i;
-            bool neighbors = same_poly && is_neighbor_idx(j, idxp.j, polygon[i].size());
-            bool same_hole_non_neighbor = same_poly && i > 0 && !is_neighbor_idx(j, idxp.j, polygon[i].size());
+            bool neighbors = i == idxp.i && is_neighbor_idx(j, idxp.j, polygon[i].size());
+            //bool same_hole_non_neighbor = same_poly && i > 0 && !is_neighbor_idx(j, idxp.j, polygon[i].size());
 
-            if (!same_hole_non_neighbor && (neighbors || is_interior_chord(polygon, seg))) {
-                adj_list_row.push_back((Edge){idxp_other, length(seg)});
+            if (/* !same_hole_non_neighbor && ( */neighbors || is_interior_chord_vertex_vertex(polygon, idxp, idxp_other)) {
+                adj_list_row.push_back((Edge){idxp_other, length(segment)});
             }
         }
     }

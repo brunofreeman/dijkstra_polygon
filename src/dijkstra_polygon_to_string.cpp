@@ -14,7 +14,7 @@ std::string to_string(const Point& point) {
 }
 
 std::string to_string(const Segment& segment) {
-    return to_string(segment.p1) + "-" + to_string(segment.p2);
+    return to_string(segment.p1) + "<->" + to_string(segment.p2);
 }
 
 std::string to_string(const IndexPair& idxp) {
