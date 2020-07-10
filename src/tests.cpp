@@ -75,6 +75,21 @@ int main(int argc, char** argv) {
     polygon_sizes.push_back(1);
     adjacency_list_sizes.push_back(7);
 
+    /*
+     * @test     05
+     * @name     irregular_1
+     * @shape    very roughly a horizontally flipped
+     *           "R" with two triangular holes and a
+     *           pertrusion with a narrow opening
+     *           into the rest of the shape
+     * @start    within the the pertrusion
+     * @end      below one of the triangular holes
+     * @location min(x) = 0, min(y) = 0
+     */
+    names.push_back("irregular_1");
+    polygon_sizes.push_back(3);
+    adjacency_list_sizes.push_back(19);
+
     for (size_t i = 0; i < names.size(); i++) {
         Polygon* polygon = (Polygon*) read_test_data(SHAPE, names[i], polygon_sizes[i]);
         PointPair* start_end = (PointPair*) read_test_data(START_END, names[i], 0);

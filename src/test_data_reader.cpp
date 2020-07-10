@@ -1,8 +1,10 @@
 #include <fstream>
 #include "test_data_reader.hpp"
 #include "test_util.hpp"
+#include <iostream>
 
 const std::string TEST_FOLDER = "test_data";
+const std::string COMMENT_TOKEN = "//";
 const std::string SHAPE_DELIMITER = "#SHAPE";
 const std::string START_END_DELIMITER = "#START_END";
 const std::string ADJACENCY_LIST_DELIMITER = "#ADJACENCY_LIST";
@@ -54,7 +56,7 @@ void* read_test_data(const ReadType type, const std::string& name, const size_t 
 
     while (getline(file, line)) {
         line.erase(std::remove_if(line.begin(), line.end(), isspace), line.end());
-
+        if (line.substr(0, 2) == COMMENT_TOKEN) continue;
         if (line == get_next_file_delimiter(type)) break;
         if (line == get_file_delimiter(type)) {
             reached = true;
