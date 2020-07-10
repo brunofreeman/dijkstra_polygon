@@ -5,11 +5,15 @@
 #include <iostream>
 #include <string>
 
+#include <queue>
+#include <set>
 #include <cmath>
 
 namespace bfreeman {
 
 const double DBL_EPSILON = 10e-7;
+const IndexPair START_IDXP = {0, 0, true};
+const IndexPair END_IDXP = {1, 1, true};
 
 enum Orientation {
     COLINEAR = 0,
@@ -166,7 +170,7 @@ bool is_interior_chord_vertex_vertex(
     const std::vector<std::vector<Point>>& polygon,
     const IndexPair& from,
     const IndexPair& to) {
-    
+
     Segment segment = {polygon[from.i][from.j], polygon[to.i][to.j]};
     Point angle_range = get_angle_range(polygon, from);
     if (!pointing_inside(segment, angle_range)) return false;
@@ -202,8 +206,8 @@ void populate_interior_adjacency(
     // TODO: should be guarded against initially
     Segment start_end = {start, end};
     if (is_interior_chord_start_or_end(polygon, start_end)) {
-        adj_list[0].push_back((Edge){IndexPair(1, 1, true), length(start_end)});
-        adj_list[1].push_back((Edge){IndexPair(0, 0, true), length(start_end)});
+        adj_list[0].push_back((Edge){END_IDXP, length(start_end)});
+        adj_list[1].push_back((Edge){START_IDXP, length(start_end)});
     }
 
     for (size_t i = 0; i < polygon.size(); i++) {
@@ -236,12 +240,12 @@ void populate_vertex_adjacency(
 
     Segment to_start = {start, vertex};
     if (is_interior_chord_start_or_end(polygon, to_start)) {
-        adj_list_row.push_back((Edge){IndexPair(0, 0, true), length(to_start)});
+        adj_list_row.push_back((Edge){START_IDXP, length(to_start)});
     }
 
     Segment to_end = {end, vertex};
     if (is_interior_chord_start_or_end(polygon, to_end)) {
-        adj_list_row.push_back((Edge){IndexPair(1, 1, true), length(to_end)});
+        adj_list_row.push_back((Edge){END_IDXP, length(to_end)});
     }
 
     for (size_t i = 0; i < polygon.size(); i++) {
@@ -262,23 +266,25 @@ void populate_vertex_adjacency(
     }
 }
 
+size_t dijkstra_points(const std::vector<std::vector<Point>>& polygon) {
+    size_t dijkstra_points = 2;
+    for (size_t i = 0; i < polygon.size(); i++) {
+        dijkstra_points += polygon[i].size();
+    }
+    return dijkstra_points;
+}
+
 std::vector<std::vector<Edge>> generate_adjacency_list(
     const std::vector<std::vector<Point>>& polygon,
     const Point& start,
     const Point& end) {
-
-    size_t vertex_count = 0;
-    for (size_t i = 0; i < polygon.size(); i++) {
-        vertex_count += polygon[i].size();
-    }
-
     /*
      * [0] = start
      * [1] = end
      * [2]...[polygon[0].size() - 1 + 2] = boundary
      * ... = holes
      */
-    std::vector<std::vector<Edge>> adj_list(vertex_count + 2);
+    std::vector<std::vector<Edge>> adj_list(dijkstra_points(polygon));
 
     populate_interior_adjacency(polygon, start, end, adj_list);
 
@@ -292,17 +298,94 @@ std::vector<std::vector<Edge>> generate_adjacency_list(
     return adj_list;
 }
 
-std::vector<Point> dijkstra_path(
+struct CompareEdge {
+    bool operator()(const Edge& e1, const Edge& e2) {
+        // return "true" if "p1" is ordered
+        // before "p2", for example:
+        // return p1.height < p2.height;
+        return false;
+    }
+};
+
+size_t idxp_to_idx(const std::vector<std::vector<Point>>& polygon, const IndexPair& idxp) {
+    if (idxp.interior) return idxp.i;
+    size_t idx = 0;
+    for (size_t i = 0; i < idxp.i; i++) {
+        idx += polygon[i].size();
+    }
+    idx += idxp.j;
+    return idx + 2;
+}
+
+struct PathDistance {
+    IndexPair idxp;
+    double path_distance;
+};
+
+struct ComparePathDistance {
+    bool operator() (const PathDistance& d1, const PathDistance& d2) { 
+        return d1.path_distance > d2.path_distance; 
+    } 
+};
+
+DijkstraData dijkstra_path(
     const std::vector<std::vector<Point>>& polygon,
     const Point& start,
     const Point& end) {
-        
+
     // TODO: bring this back at the end
     /* if (is_interior_chord(polygon, (Segment){start, end})) {
         return std::vector<Point>(0);
     } */
+
     std::vector<std::vector<Edge>> adj_list = generate_adjacency_list(polygon, start, end);
-    return std::vector<Point>(0);
+
+    size_t total_points = dijkstra_points(polygon);
+    std::priority_queue<PathDistance, std::vector<PathDistance>, ComparePathDistance> point_queue;
+    //std::set<PathDistance, ComparePathDistance> point_set;
+    std::vector<double> distances(total_points);
+
+
+
+    point_queue.push((PathDistance){START_IDXP, 0});
+    point_queue.push((PathDistance){END_IDXP, __DBL_MAX__});
+    size_t dist_idx = 0;
+    distances[dist_idx++] = 0;
+    distances[dist_idx++] = __DBL_MAX__;
+
+
+
+    for (size_t i = 0; i < polygon.size(); i++) {
+        for (size_t j = 0; j < polygon[i].size(); j++) {
+            point_queue.push((PathDistance){IndexPair(i, j), __DBL_MAX__});
+            distances[dist_idx++] = __DBL_MAX__;
+        }
+    }
+    
+    std::set<size_t> visited;
+    std::vector<Point> dijkstra_path;
+
+    while (!point_queue.empty()) {
+        
+        PathDistance curr_point = point_queue.top();
+        point_queue.pop();
+        //point_queue.erase(point_queue.begin());
+        size_t point_idx = idxp_to_idx(polygon, curr_point.idxp);
+        visited.insert(point_idx);
+
+        for (size_t i = 0; i < adj_list[point_idx].size(); i++) {
+            size_t adj_idx = idxp_to_idx(polygon, adj_list[point_idx][i].idxp);
+            if (visited.find(adj_idx) != visited.end()) continue;
+            double distance_between = adj_list[point_idx][i].distance;
+
+            if (distances[adj_idx] > distance_between + distances[point_idx]) {
+                distances[adj_idx] = distance_between + distances[point_idx];
+                point_queue.push((PathDistance){adj_list[point_idx][i].idxp, distances[adj_idx]});
+            }
+        }
+    }
+
+    return (DijkstraData){dijkstra_path, distances[1]};
 }
 
 } // namespace bfreeman

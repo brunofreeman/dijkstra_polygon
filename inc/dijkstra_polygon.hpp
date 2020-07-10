@@ -45,6 +45,11 @@ std::vector<std::vector<Edge>> generate_adjacency_list(
     const Point& end
 );
 
+struct DijkstraData {
+    std::vector<Point> path;
+    double distance;
+};
+
 /*
  * Assumes that start and end are valid interior points of the polygon
  * (i.e., within its boundray and not within any holes).
@@ -58,15 +63,17 @@ std::vector<std::vector<Edge>> generate_adjacency_list(
  *
  * @param polygon a represented by (x, y) coordinates.
  *        The first std::vector defines the boundary.
- *        Subsequent std::vectors are define holes.
+ *        Subsequent std::vectors define holes.
  * @param start the starting point
  * @param end the ending point
- * @return an std::vector containing all, if any, intermediate
- *         points needed to reach end from start in the shortest
- *         distance without leaving the polygon boundary or
- *         crossing polygon holes
+ * @return an std::pair containg
+ *         first: an std::vector containing all, if any,
+ *         intermediate points needed to reach end from
+ *         start in the shortest distance without leaving
+ *         the polygon boundary or crossing polygon holes
+ *         second: the length of the path
  */
-std::vector<Point> dijkstra_path(
+DijkstraData dijkstra_path(
     const std::vector<std::vector<Point>>& polygon,
     const Point& start,
     const Point& end

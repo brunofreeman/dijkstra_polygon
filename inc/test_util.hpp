@@ -25,6 +25,8 @@ void run_test(
     const Polygon& polygon,
     const AdjacencyList& test_al,
     const AdjacencyList& true_al,
+    const double test_path_length,
+    const double true_path_length,
     unsigned short& passed_tests,
     const bool verbose
 );

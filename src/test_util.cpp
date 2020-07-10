@@ -19,6 +19,10 @@ void print_adjacency_list(const Polygon& polygon, const AdjacencyList& adjacency
     std::cout << bfreeman::to_string(polygon, adjacency_list) << std::endl;
 }
 
+void print_path_lengths(const double test_path_length, const double true_path_length) {
+    std::cout << "Generated path length: " << test_path_length << ", actual: " << true_path_length << std::endl;
+}
+
 void print_seperation_line() {
     for (size_t i = 0; i < SEPARATION_LINE_LENGTH; i++) {
         std::cout << '-';
@@ -86,10 +90,12 @@ void run_test(
     const Polygon& polygon,
     const AdjacencyList& test_al,
     const AdjacencyList& true_al,
+    const double test_path_length,
+    const double true_path_length,
     unsigned short& passed_tests,
     const bool verbose) {
     
-    bool passed = compare_al(test_al, true_al);
+    bool passed = compare_al(test_al, true_al) && is_close(test_path_length, true_path_length);
     if (verbose || !passed) {
         print_label(name);
         print_polygon(polygon);
@@ -97,6 +103,10 @@ void run_test(
         print_adjacency_list(polygon, test_al);
         print_label("Correct adjacency list");
         print_adjacency_list(polygon, true_al);
+        print_label("Generated path length:");
+        print_adjacency_list(polygon, true_al);
+        print_path_lengths(test_path_length, true_path_length);
+        print_seperation_line();
     }
     if (passed) {
         std::cout << "PASSED " << name << std::endl;

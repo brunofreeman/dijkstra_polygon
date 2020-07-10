@@ -97,11 +97,16 @@ int main(int argc, char** argv) {
         AdjacencyList test_al = bfreeman::generate_adjacency_list(*polygon, start_end->start, start_end->end);
         AdjacencyList* true_al = (AdjacencyList*)read_test_data(ADJACENCY_LIST, names[i], adjacency_list_sizes[i]);
 
-        run_test(names[i], *polygon, test_al, *true_al, passed_tests, verbose);
+        bfreeman::DijkstraData dijkstra_data = bfreeman::dijkstra_path(*polygon, start_end->start, start_end->end);
+        
+        double* true_path_length = (double*)read_test_data(PATH_LENGTH, names[i], 0);
+
+        run_test(names[i], *polygon, test_al, *true_al, dijkstra_data.distance, *true_path_length, passed_tests, verbose);
 
         delete polygon;
         delete start_end;
         delete true_al;
+        delete true_path_length;
     }
 
     print_test_report(passed_tests, names.size());

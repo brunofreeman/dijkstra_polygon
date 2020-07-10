@@ -8,6 +8,7 @@ const std::string COMMENT_TOKEN = "//";
 const std::string SHAPE_DELIMITER = "#SHAPE";
 const std::string START_END_DELIMITER = "#START_END";
 const std::string ADJACENCY_LIST_DELIMITER = "#ADJACENCY_LIST";
+const std::string PATH_LENGTH_DELIMITER = "#PATH_LENGTH";
 
 std::string get_file_delimiter(const ReadType type) {
     switch (type) {
@@ -17,6 +18,8 @@ std::string get_file_delimiter(const ReadType type) {
             return START_END_DELIMITER;
         case ADJACENCY_LIST:
             return ADJACENCY_LIST_DELIMITER;
+        case PATH_LENGTH:
+            return PATH_LENGTH_DELIMITER;
     }
 }
 
@@ -27,6 +30,8 @@ std::string get_next_file_delimiter(const ReadType type) {
         case START_END:
             return ADJACENCY_LIST_DELIMITER;
         case ADJACENCY_LIST:
+            return PATH_LENGTH_DELIMITER;
+        case PATH_LENGTH:
             return "";
     }
 }
@@ -35,6 +40,7 @@ void* read_test_data(const ReadType type, const std::string& name, const size_t 
     Polygon* polygon;
     PointPair* start_end;
     AdjacencyList* adj_list;
+    double* path_length;
 
     switch (type) {
         case SHAPE:
@@ -45,6 +51,9 @@ void* read_test_data(const ReadType type, const std::string& name, const size_t 
             break;
         case ADJACENCY_LIST:
             adj_list = new AdjacencyList(size);
+            break;
+        case PATH_LENGTH:
+            path_length = new double;
             break;
     }
 
@@ -139,6 +148,9 @@ void* read_test_data(const ReadType type, const std::string& name, const size_t 
                 distance = std::stod(line);
                 push_edge((*adj_list)[adj_idx], i, j, interior, distance);
                 break;
+            case PATH_LENGTH:
+                *path_length = std::stod(line);
+                break;
         }
     }
 
@@ -147,5 +159,6 @@ void* read_test_data(const ReadType type, const std::string& name, const size_t 
         case SHAPE: return (void*) polygon;
         case START_END: return (void*) start_end;
         case ADJACENCY_LIST: return (void*) adj_list;
+        case PATH_LENGTH: return (void *) path_length;
     }
 }
