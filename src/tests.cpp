@@ -53,7 +53,8 @@ int main(int argc, char** argv) {
     /*
      * @test     03
      * @name     sq_in_sq
-     * @shape    unit square with 0.2-side square hole centered
+     * @shape    unit square with 0.2-side square
+     *           hole in the middle
      * @start    off the bottom left corner
      * @end off  the top right corner
      * @location centered on origin
@@ -80,9 +81,9 @@ int main(int argc, char** argv) {
      * @name     irregular_1
      * @shape    very roughly a horizontally flipped
      *           "R" with two triangular holes and a
-     *           pertrusion with a narrow opening
+     *           protrusion with a narrow opening
      *           into the rest of the shape
-     * @start    within the the pertrusion
+     * @start    within the the protrusion
      * @end      below one of the triangular holes
      * @location min(x) = 0, min(y) = 0
      */
