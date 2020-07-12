@@ -1,8 +1,8 @@
 # dijkstra_polygon
 
 ## CMake Commands
-```cmake -Bout -H.```
+Initialize CMake: ```cmake -Bout -H.```
 
-```cmake --build ./out```
+Build: ```cmake --build ./out```
 
-```./out/bin/tests```
+Run tests: ```./out/bin/tests```

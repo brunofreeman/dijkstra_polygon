@@ -94,7 +94,7 @@ void run_test(
     const double true_path_length,
     unsigned short& passed_tests,
     const bool verbose) {
-    
+
     bool passed = compare_al(test_al, true_al) && is_close(test_path_length, true_path_length);
     if (verbose || !passed) {
         print_label(name);
@@ -118,6 +118,6 @@ void run_test(
 
 void print_test_report(const size_t passed_tests, const size_t total_tests) {
     float percent = 100.0f * passed_tests / total_tests;
-    std::cout << passed_tests << " PASSED out of " << total_tests << " (" << std::fixed
-              << std::setprecision(1) << percent << "%)" << std::endl;
+    std::cout << "PASSED " << passed_tests << " out of " << total_tests << " tests ("
+              << std::fixed << std::setprecision(1) << percent << "%)" << std::endl;
 }
