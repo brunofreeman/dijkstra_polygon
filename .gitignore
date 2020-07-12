@@ -31,6 +31,11 @@
 *.out
 *.app
 
-# Make
+# CMake/Makefile
 bin/
 obj/
+out/
+CMakeFiles/
+cmake_install.cmake
+CMakeCache.txt
+Makefile
