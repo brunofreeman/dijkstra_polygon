@@ -1,8 +1,5 @@
 # dijkstra_polygon
-
-## CMake Commands
-Initialize CMake: ```cmake -Bout -H.```
-
-Build: ```cmake --build ./out```
-
-Run tests: ```./out/bin/tests```
+# Notes
+<ul>
+<li>In order to read test files, the project must be run from the content root directory</li>
+</ul>
