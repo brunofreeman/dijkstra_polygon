@@ -79,7 +79,7 @@ int main(int argc, char** argv) {
 
     /*
      * @test     05
-     * @name     irregular_1
+     * @name     irregular_1_1
      * @shape    very roughly a horizontally flipped
      *           "R" with two triangular holes and a
      *           protrusion with a narrow opening
@@ -88,7 +88,19 @@ int main(int argc, char** argv) {
      * @end      below one of the triangular holes
      * @location min(x) = 0, min(y) = 0
      */
-    names.emplace_back("irregular_1");
+    names.emplace_back("irregular_1_1");
+    polygon_sizes.push_back(3);
+    adjacency_list_sizes.push_back(19);
+
+    /*
+     * @test     06
+     * @name     irregular_1_2
+     * @shape    same as irregular_1_1
+     * @start    within the the protrusion
+     * @end      below one of the triangular holes
+     * @location min(x) = 0, min(y) = 0
+     */
+    names.emplace_back("irregular_1_2");
     polygon_sizes.push_back(3);
     adjacency_list_sizes.push_back(19);
 

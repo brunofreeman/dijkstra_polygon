@@ -140,8 +140,6 @@ void run_test(
         print_adjacency_list(polygon, test_adjacency_list);
         print_label("Correct adjacency list");
         print_adjacency_list(polygon, true_adjacency_list);
-        print_label("Generated path length:");
-        print_adjacency_list(polygon, true_adjacency_list);
         print_path_lengths(test_path_length, true_path_length);
         print_path_points(test_path_points, true_path_points);
         print_seperation_line();
