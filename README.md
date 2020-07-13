@@ -71,3 +71,8 @@ std::cout << ": " << dd.distance << std::endl;
 ```
 
 This code will print `(-4.5, -4.5), (-3, -4), (4, 0): 9.6434`, signifying that the shortest interior path between `start` and `end` requires navigation around the lower right corner of the triangular hole and that the total path length is `9.6434` units.
+
+## Tests
+Six tests have been writen for `dijkstra_polygon` thus far. To run these tests, one can use the included `CMakeLists.txt` to build the project and then run the `tests` executable from the project directory. All tests are currently passing. Descriptions of the tests can be found in `tests.cpp`.
+
+Each test has an associated file in the `def` directory that contains all of the correct data `dijkstra_polygon` needs to output in order to pass. In the case of multiple correct solutions (such as two equal paths in a symmetrical polygon), the files in `def` structure their data in anticipation of how `dijkstra_polygon` will tiebreak. `dijkstra_polygon` tiebreaks by returning the lexicographically (in terms of indices) lowest solution. For example, if two equal paths consisted of `{start, polygon[1][1], end}` and `{start, polygon[1][3], end}`, `dijkstra_polygon` will return `{start, polygon[1][1], end}`.
