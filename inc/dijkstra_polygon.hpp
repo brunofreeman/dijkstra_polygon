@@ -13,6 +13,11 @@ struct Point {
     double y;
 };
 
+struct DijkstraData {
+    std::vector<Point> path;
+    double distance;
+};
+
 struct Segment {
     Point p1;
     Point p2;
@@ -34,11 +39,6 @@ struct IndexPair {
 
 struct Edge {
     IndexPair idxp;
-    double distance;
-};
-
-struct DijkstraData {
-    std::vector<Point> path;
     double distance;
 };
 

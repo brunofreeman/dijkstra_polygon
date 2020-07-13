@@ -3,6 +3,7 @@
 #include "dijkstra_polygon.hpp"
 #include "test_util.hpp"
 #include "test_data_reader.hpp"
+#include <iostream>
 
 
 int main(int argc, char** argv) {
