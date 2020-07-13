@@ -49,14 +49,6 @@ void print_seperation_line() {
     std::cout << std::endl;
 }
 
-void push_point(std::vector<bfreeman::Point>& point_vec, double x, double y) {
-    point_vec.push_back((bfreeman::Point) {x, y});
-}
-
-void push_edge(std::vector<bfreeman::Edge>& edge_vec, size_t i, size_t j, bool interior, double distance) {
-    edge_vec.push_back((bfreeman::Edge) {(bfreeman::IndexPair) {i, j, interior}, distance});
-}
-
 bool is_close(const double a, const double b) {
     return fabs(a - b) < DBL_EPSILON;
 }
@@ -64,7 +56,7 @@ bool is_close(const double a, const double b) {
 bool is_close(const bfreeman::Edge& e1, const bfreeman::Edge& e2) {
     return e1.idxp.i == e2.idxp.i &&
            e1.idxp.j == e2.idxp.j &&
-           e1.idxp.interior == e1.idxp.interior &&
+           e1.idxp.interior == e2.idxp.interior &&
            is_close(e1.distance, e2.distance);
 }
 

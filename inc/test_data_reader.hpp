@@ -9,6 +9,10 @@ enum ReadType {
     PATH_POINTS = 4
 };
 
+/*
+ * Reads, constructs, and returns the specified
+ * type of data from the file of the given name.
+ */
 void* read_test_data(const ReadType type, const std::string& name, const size_t size);
 
 #endif // #ifndef __TEST_DATA_READER_HPP__

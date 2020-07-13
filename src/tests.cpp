@@ -34,7 +34,7 @@ int main(int argc, char** argv) {
      * @end      off the top right corner
      * @location bottom left corner on origin
      */
-    names.push_back("unit_sq_q1");
+    names.emplace_back("unit_sq_q1");
     polygon_sizes.push_back(1);
     adjacency_list_sizes.push_back(6);
 
@@ -46,7 +46,7 @@ int main(int argc, char** argv) {
      * @end      off the top right corner
      * @location centered on origin
      */
-    names.push_back("unit_sq_all_q");
+    names.emplace_back("unit_sq_all_q");
     polygon_sizes.push_back(1);
     adjacency_list_sizes.push_back(6);
 
@@ -59,7 +59,7 @@ int main(int argc, char** argv) {
      * @end off  the top right corner
      * @location centered on origin
      */
-    names.push_back("sq_in_sq");
+    names.emplace_back("sq_in_sq");
     polygon_sizes.push_back(2);
     adjacency_list_sizes.push_back(10);
 
@@ -72,7 +72,7 @@ int main(int argc, char** argv) {
      * @end      within the right peak
      * @location bottom left corner on origin
      */
-    names.push_back("mountain");
+    names.emplace_back("mountain");
     polygon_sizes.push_back(1);
     adjacency_list_sizes.push_back(7);
 
@@ -87,22 +87,27 @@ int main(int argc, char** argv) {
      * @end      below one of the triangular holes
      * @location min(x) = 0, min(y) = 0
      */
-    names.push_back("irregular_1");
+    names.emplace_back("irregular_1");
     polygon_sizes.push_back(3);
     adjacency_list_sizes.push_back(19);
 
+    /*
+     * For each test, reads in data from the test file and
+     * also generates the data using dijkstra_polygon.
+     * The file and generated results then are compared.
+     */
     for (size_t i = 0; i < names.size(); i++) {
-        Polygon* polygon = (Polygon*) read_test_data(SHAPE, names[i], polygon_sizes[i]);
-        PointPair* start_end = (PointPair*) read_test_data(START_END, names[i], 0);
+        auto* polygon = (Polygon*) read_test_data(SHAPE, names[i], polygon_sizes[i]);
+        auto* start_end = (PointPair*) read_test_data(START_END, names[i], 0);
 
         AdjacencyList test_al = bfreeman::generate_adjacency_list(*polygon, start_end->start, start_end->end);
-        AdjacencyList* true_al = (AdjacencyList*) read_test_data(ADJACENCY_LIST, names[i], adjacency_list_sizes[i]);
+        auto* true_al = (AdjacencyList*) read_test_data(ADJACENCY_LIST, names[i], adjacency_list_sizes[i]);
 
         bfreeman::DijkstraData dijkstra_data = bfreeman::dijkstra_path(*polygon, start_end->start, start_end->end);
 
-        double* true_path_length = (double*) read_test_data(PATH_LENGTH, names[i], 0);
+        auto* true_path_length = (double*) read_test_data(PATH_LENGTH, names[i], 0);
 
-        std::vector<bfreeman::Point>* true_path_points = (std::vector<bfreeman::Point>*)
+        auto* true_path_points = (std::vector<bfreeman::Point>*)
                 read_test_data(PATH_POINTS, names[i], 0);
 
         run_test(names[i], *polygon, test_al, *true_al, dijkstra_data.distance, *true_path_length,

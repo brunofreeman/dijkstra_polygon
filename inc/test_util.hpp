@@ -12,16 +12,11 @@ struct PointPair {
     bfreeman::Point end;
 };
 
-void push_point(std::vector<bfreeman::Point>& point_vec, double x, double y);
-
-void push_edge(std::vector<bfreeman::Edge>& edge_vec, size_t i, size_t j, bool interior, double distance);
-
-bool is_close(const bfreeman::Edge& e1, const bfreeman::Edge& e2);
-
-bool compare_adjacency_list(const AdjacencyList& test_al, const AdjacencyList& true_al);
-
-bool compare_path(const std::vector<bfreeman::Point>& test_p, const std::vector<bfreeman::Point>& true_p);
-
+/*
+ * Compares generated values and values designated as correct.
+ * Prints the data for each if -v is passed as a program argument
+ * or if the test fails.
+ */
 void run_test(
         std::string name,
         const Polygon& polygon,
@@ -35,6 +30,9 @@ void run_test(
         const bool verbose
 );
 
+/*
+ * Prints a fraction and percentage of tests passed.
+ */
 void print_test_report(const size_t passed_tests, const size_t total_tests);
 
 #endif // #ifndef __TEST_UTIL_HPP__
