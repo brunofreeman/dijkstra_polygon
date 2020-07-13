@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
     names.push_back("unit_sq_all_q");
     polygon_sizes.push_back(1);
     adjacency_list_sizes.push_back(6);
-    
+
     /*
      * @test     03
      * @name     sq_in_sq
@@ -96,17 +96,17 @@ int main(int argc, char** argv) {
         PointPair* start_end = (PointPair*) read_test_data(START_END, names[i], 0);
 
         AdjacencyList test_al = bfreeman::generate_adjacency_list(*polygon, start_end->start, start_end->end);
-        AdjacencyList* true_al = (AdjacencyList*)read_test_data(ADJACENCY_LIST, names[i], adjacency_list_sizes[i]);
+        AdjacencyList* true_al = (AdjacencyList*) read_test_data(ADJACENCY_LIST, names[i], adjacency_list_sizes[i]);
 
         bfreeman::DijkstraData dijkstra_data = bfreeman::dijkstra_path(*polygon, start_end->start, start_end->end);
 
-        double* true_path_length = (double*)read_test_data(PATH_LENGTH, names[i], 0);
+        double* true_path_length = (double*) read_test_data(PATH_LENGTH, names[i], 0);
 
         std::vector<bfreeman::Point>* true_path_points = (std::vector<bfreeman::Point>*)
                 read_test_data(PATH_POINTS, names[i], 0);
 
         run_test(names[i], *polygon, test_al, *true_al, dijkstra_data.distance, *true_path_length,
-                dijkstra_data.path, *true_path_points, passed_tests, verbose);
+                 dijkstra_data.path, *true_path_points, passed_tests, verbose);
 
         delete polygon;
         delete start_end;

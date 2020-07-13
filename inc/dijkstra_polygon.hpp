@@ -5,50 +5,52 @@
 
 namespace bfreeman {
 
-struct Point {
-    double x;
-    double y;
-};
+    struct Point {
+        double x;
+        double y;
+    };
 
-struct Segment {
-    Point p1;
-    Point p2;
-};
+    struct Segment {
+        Point p1;
+        Point p2;
+    };
 
-struct IndexPair {
-    size_t i;
-    size_t j;
-    bool interior;
-    IndexPair(size_t i, size_t j) : i(i), j(j), interior(false) {}
-    IndexPair(size_t i, size_t j, bool interior) : i(i), j(j), interior(interior) {}
-};
+    struct IndexPair {
+        size_t i;
+        size_t j;
+        bool interior;
 
-struct Edge {
-    IndexPair idxp;
-    double distance;
-};
+        IndexPair(size_t i, size_t j) : i(i), j(j), interior(false) {}
 
-bool is_interior_chord_vertex_vertex(
-    const std::vector<std::vector<Point>>& polygon,
-    const IndexPair& from,
-    const IndexPair& to
-);
+        IndexPair(size_t i, size_t j, bool interior) : i(i), j(j), interior(interior) {}
+    };
 
-bool is_interior_chord_start_or_end(
-    const std::vector<std::vector<Point>>& polygon,
-    const Segment& segment
-);
+    struct Edge {
+        IndexPair idxp;
+        double distance;
+    };
 
-std::vector<std::vector<Edge>> generate_adjacency_list(
-    const std::vector<std::vector<Point>>& polygon,
-    const Point& start,
-    const Point& end
-);
+    bool is_interior_chord_vertex_vertex(
+            const std::vector<std::vector<Point>>& polygon,
+            const IndexPair& from,
+            const IndexPair& to
+    );
 
-struct DijkstraData {
-    std::vector<Point> path;
-    double distance;
-};
+    bool is_interior_chord_start_or_end(
+            const std::vector<std::vector<Point>>& polygon,
+            const Segment& segment
+    );
+
+    std::vector<std::vector<Edge>> generate_adjacency_list(
+            const std::vector<std::vector<Point>>& polygon,
+            const Point& start,
+            const Point& end
+    );
+
+    struct DijkstraData {
+        std::vector<Point> path;
+        double distance;
+    };
 
 /*
  * Assumes that start and end are valid interior points of the polygon
@@ -73,11 +75,11 @@ struct DijkstraData {
  *         the polygon boundary or crossing polygon holes
  *         second: the length of the path
  */
-DijkstraData dijkstra_path(
-    const std::vector<std::vector<Point>>& polygon,
-    const Point& start,
-    const Point& end
-);
+    DijkstraData dijkstra_path(
+            const std::vector<std::vector<Point>>& polygon,
+            const Point& start,
+            const Point& end
+    );
 
 } // namespace bfreeman
 

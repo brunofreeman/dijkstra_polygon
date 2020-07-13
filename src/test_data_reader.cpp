@@ -5,11 +5,11 @@
 
 const std::string TEST_FOLDER = "def";
 const std::string COMMENT_TOKEN = "//";
-const std::string SHAPE_DELIMITER          = "#SHAPE";
-const std::string START_END_DELIMITER      = "#START_END";
+const std::string SHAPE_DELIMITER = "#SHAPE";
+const std::string START_END_DELIMITER = "#START_END";
 const std::string ADJACENCY_LIST_DELIMITER = "#ADJACENCY_LIST";
-const std::string PATH_LENGTH_DELIMITER    = "#PATH_LENGTH";
-const std::string PATH_POINTS_DELIMITER    = "#PATH_POINTS";
+const std::string PATH_LENGTH_DELIMITER = "#PATH_LENGTH";
+const std::string PATH_POINTS_DELIMITER = "#PATH_POINTS";
 
 std::string get_file_delimiter(const ReadType type) {
     switch (type) {
@@ -156,7 +156,8 @@ void* read_test_data(const ReadType type, const std::string& name, const size_t 
                 break;
             case START_END:
                 y2 = std::stod(line);
-                *start_end = {{x1, y1}, {x2, y2}};
+                *start_end = {{x1, y1},
+                              {x2, y2}};
                 break;
             case ADJACENCY_LIST:
                 distance = std::stod(line);
@@ -174,10 +175,15 @@ void* read_test_data(const ReadType type, const std::string& name, const size_t 
 
     file.close();
     switch (type) {
-        case SHAPE: return (void*) polygon;
-        case START_END: return (void*) start_end;
-        case ADJACENCY_LIST: return (void*) adj_list;
-        case PATH_LENGTH: return (void*) path_length;
-        case PATH_POINTS: return (void*) path_points;
+        case SHAPE:
+            return (void*) polygon;
+        case START_END:
+            return (void*) start_end;
+        case ADJACENCY_LIST:
+            return (void*) adj_list;
+        case PATH_LENGTH:
+            return (void*) path_length;
+        case PATH_POINTS:
+            return (void*) path_points;
     }
 }

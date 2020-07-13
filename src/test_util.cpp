@@ -7,9 +7,9 @@
 const double DBL_EPSILON = 10e-7;
 const unsigned char SEPARATION_LINE_LENGTH = 100;
 
-bool compare_path(const std::vector<bfreeman::Point> &test_p, const std::vector<bfreeman::Point> &true_p);
+bool compare_path(const std::vector<bfreeman::Point>& test_p, const std::vector<bfreeman::Point>& true_p);
 
-void print_path_points(const std::vector<bfreeman::Point> &test_p, const std::vector<bfreeman::Point> &true_p);
+void print_path_points(const std::vector<bfreeman::Point>& test_p, const std::vector<bfreeman::Point>& true_p);
 
 void print_label(std::string label) {
     std::cout << label + ":" << std::endl;
@@ -49,12 +49,12 @@ void print_seperation_line() {
     std::cout << std::endl;
 }
 
-void push_point(std::vector<bfreeman::Point>& vec, double x, double y) {
-    vec.push_back((bfreeman::Point){x, y});
+void push_point(std::vector<bfreeman::Point>& point_vec, double x, double y) {
+    point_vec.push_back((bfreeman::Point) {x, y});
 }
 
-void push_edge(std::vector<bfreeman::Edge>& vec, size_t i, size_t j, bool interior, double distance) {
-    vec.push_back((bfreeman::Edge){(bfreeman::IndexPair){i, j, interior}, distance});
+void push_edge(std::vector<bfreeman::Edge>& edge_vec, size_t i, size_t j, bool interior, double distance) {
+    edge_vec.push_back((bfreeman::Edge) {(bfreeman::IndexPair) {i, j, interior}, distance});
 }
 
 bool is_close(const double a, const double b) {
@@ -127,16 +127,16 @@ bool compare_path(const std::vector<bfreeman::Point>& test_p, const std::vector<
 }
 
 void run_test(
-    std::string name,
-    const Polygon& polygon,
-    const AdjacencyList& test_adjacency_list,
-    const AdjacencyList& true_adjacency_list,
-    const double test_path_length,
-    const double true_path_length,
-    const std::vector<bfreeman::Point>& test_path_points,
-    const std::vector<bfreeman::Point>& true_path_points,
-    unsigned short& passed_tests,
-    const bool verbose) {
+        std::string name,
+        const Polygon& polygon,
+        const AdjacencyList& test_adjacency_list,
+        const AdjacencyList& true_adjacency_list,
+        const double test_path_length,
+        const double true_path_length,
+        const std::vector<bfreeman::Point>& test_path_points,
+        const std::vector<bfreeman::Point>& true_path_points,
+        unsigned short& passed_tests,
+        const bool verbose) {
 
     bool passed = compare_adjacency_list(test_adjacency_list, true_adjacency_list)
                   && is_close(test_path_length, true_path_length)
