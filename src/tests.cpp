@@ -102,12 +102,17 @@ int main(int argc, char** argv) {
 
         double* true_path_length = (double*)read_test_data(PATH_LENGTH, names[i], 0);
 
-        run_test(names[i], *polygon, test_al, *true_al, dijkstra_data.distance, *true_path_length, passed_tests, verbose);
+        std::vector<bfreeman::Point>* true_path_points = (std::vector<bfreeman::Point>*)
+                read_test_data(PATH_POINTS, names[i], 0);
+
+        run_test(names[i], *polygon, test_al, *true_al, dijkstra_data.distance, *true_path_length,
+                dijkstra_data.path, *true_path_points, passed_tests, verbose);
 
         delete polygon;
         delete start_end;
         delete true_al;
         delete true_path_length;
+        delete true_path_points;
     }
 
     print_test_report(passed_tests, names.size());

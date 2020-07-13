@@ -5,7 +5,8 @@ enum ReadType {
     SHAPE = 0,
     START_END = 1,
     ADJACENCY_LIST = 2,
-    PATH_LENGTH = 3
+    PATH_LENGTH = 3,
+    PATH_POINTS = 4
 };
 
 void* read_test_data(const ReadType type, const std::string& name, const size_t size);

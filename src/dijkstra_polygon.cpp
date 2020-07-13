@@ -1,10 +1,6 @@
 #include "dijkstra_polygon.hpp"
 #include "dijkstra_polygon_to_string.hpp"
 
-// TODO: remove when done debugging
-#include <iostream>
-#include <string>
-
 #include <queue>
 #include <set>
 #include <cmath>
@@ -203,7 +199,6 @@ void populate_interior_adjacency(
     const Point& end,
     std::vector<std::vector<Edge>>& adj_list) {
 
-    // TODO: should be guarded against initially
     Segment start_end = {start, end};
     if (is_interior_chord_start_or_end(polygon, start_end)) {
         adj_list[0].push_back((Edge){END_IDXP, length(start_end)});
@@ -298,15 +293,6 @@ std::vector<std::vector<Edge>> generate_adjacency_list(
     return adj_list;
 }
 
-struct CompareEdge {
-    bool operator()(const Edge& e1, const Edge& e2) {
-        // return "true" if "p1" is ordered
-        // before "p2", for example:
-        // return p1.height < p2.height;
-        return false;
-    }
-};
-
 size_t idxp_to_idx(const std::vector<std::vector<Point>>& polygon, const IndexPair& idxp) {
     if (idxp.interior) return idxp.i;
     size_t idx = 0;
@@ -315,6 +301,17 @@ size_t idxp_to_idx(const std::vector<std::vector<Point>>& polygon, const IndexPa
     }
     idx += idxp.j;
     return idx + 2;
+}
+
+IndexPair idx_to_idxp(const std::vector<std::vector<Point>>& polygon, size_t idx) {
+    if (idx == 0) return START_IDXP;
+    if (idx == 1) return END_IDXP;
+    idx -= 2;
+    for (size_t i = 0; i < polygon.size(); i++) {
+        for (size_t j = 0; j < polygon[i].size(); j++) {
+            if (idx-- == 0) return IndexPair(i, j);
+        }
+    }
 }
 
 struct PathDistance {
@@ -342,7 +339,6 @@ DijkstraData dijkstra_path(
 
     size_t total_points = dijkstra_points(polygon);
     std::priority_queue<PathDistance, std::vector<PathDistance>, ComparePathDistance> point_queue;
-    //std::set<PathDistance, ComparePathDistance> point_set;
     std::vector<double> distances(total_points);
 
 
@@ -363,13 +359,13 @@ DijkstraData dijkstra_path(
     }
     
     std::set<size_t> visited;
-    std::vector<Point> dijkstra_path;
+    std::vector<size_t> prev_point_in_shortest_path(total_points);
 
+    // Dijkstra
     while (!point_queue.empty()) {
         
         PathDistance curr_point = point_queue.top();
         point_queue.pop();
-        //point_queue.erase(point_queue.begin());
         size_t point_idx = idxp_to_idx(polygon, curr_point.idxp);
         visited.insert(point_idx);
 
@@ -380,10 +376,22 @@ DijkstraData dijkstra_path(
 
             if (distances[adj_idx] > distance_between + distances[point_idx]) {
                 distances[adj_idx] = distance_between + distances[point_idx];
+                prev_point_in_shortest_path[adj_idx] = point_idx;
                 point_queue.push((PathDistance){adj_list[point_idx][i].idxp, distances[adj_idx]});
             }
         }
     }
+
+    std::vector<Point> dijkstra_path;
+    size_t backtrack_idx = 1;
+    while (prev_point_in_shortest_path[backtrack_idx] != 0) {
+        backtrack_idx = prev_point_in_shortest_path[backtrack_idx];
+        IndexPair idxp = idx_to_idxp(polygon, backtrack_idx);
+        dijkstra_path.insert(dijkstra_path.begin(), polygon[idxp.i][idxp.j]);
+    }
+
+    dijkstra_path.insert(dijkstra_path.begin(), start);
+    dijkstra_path.push_back(end);
 
     return (DijkstraData){dijkstra_path, distances[1]};
 }

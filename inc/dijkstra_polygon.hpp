@@ -67,8 +67,8 @@ struct DijkstraData {
  * @param start the starting point
  * @param end the ending point
  * @return an std::pair containg
- *         first: an std::vector containing all, if any,
- *         intermediate points needed to reach end from
+ *         first: an std::vector containing the points,
+ *         including start and end, needed to reach end from
  *         start in the shortest distance without leaving
  *         the polygon boundary or crossing polygon holes
  *         second: the length of the path
