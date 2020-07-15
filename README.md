@@ -5,7 +5,7 @@
 ## Installation
 `CMakeLists.txt` will build, by default, a dynamic library with the functionality of `dijkstra_polygon.cpp`. `CMakeLists.txt` can be modified to build a static library and/or include `to_string` functionality from `dijkstra_polygon_to_string.cpp`.
 
-The generated library will need to be linked to your build, and the pertinent header files will need to be included where needed. In MacOS, this could be accomplished by placing the library file in `usr/local/lib/` and the header file(s) in `usr/local/include/bfreeman/`. The library file could then be linked via a `CMakeLists.txt` or other build tool. Finally, the header files should be included in your source files with `#include <bfreeman/file_name.hpp>`.
+The generated library will need to be linked to your build, and the pertinent header files will need to be included where needed. In macOS, this could be accomplished by placing the library file in `usr/local/lib/` and the header file(s) in `usr/local/include/bfreeman/`. The library file could then be linked via a `CMakeLists.txt` or other build tool. Finally, the header files should be included in your source files with `#include <bfreeman/file_name.hpp>`.
 
 When it becomes available publicly, [my research project](https://github.com/brunofreeman/dpo_pdf) will serve as an example of linking `dijkstra_polygon` to another build with a `CMakeLists.txt` and including the header files in the source.
 
