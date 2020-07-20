@@ -1,0 +1,13 @@
+#SHAPE
+0,  45,   0
+0,  60,  70
+0,  40,  50
+0,  40,  55
+0, 100, 150
+0,  60, 120
+0,  35, 160
+0,   0,  10
+#START_END
+#ADJACENCY_LIST
+#PATH_LENGTH
+#PATH_POIN
