@@ -89,6 +89,10 @@ bool check_intersect(const Segment& seg1, const Segment& seg2) {
            (o4 == COLINEAR && on_segment(seg2, seg1.p2));
 }
 
+/*
+ * @return the (positive) angle formed between the x-axis
+ *         and the line between origin and angle_point
+ */
 double get_relative_angle(const Point& origin, Point angle_point) {
     angle_point -= origin;
     if (is_close(angle_point.x, 0)) {
@@ -121,6 +125,12 @@ double get_relative_angle(const Point& origin, Point angle_point) {
     }
 }
 
+/*
+ * @return uses the Point struct (two doubles packaged together)
+ *         to return two radian values that represent the valid
+ *         interior angle range for a point (i.e. lines coming off
+ *         of the point at those angles will start inside the polygon)
+ */
 Point get_angle_range(const std::vector<std::vector<Point>>& polygon, const IndexPair& idxp) {
     // assumes a clockwise winding
     Point point_prev = polygon[idxp.i][(idxp.j == 0 ? polygon[idxp.i].size() : idxp.j) - 1];
@@ -151,22 +161,11 @@ bool pointing_inside(Segment segment, const Point& angle_range) {
     return angle_range.x <= angle && angle <= angle_range.y;
 }
 
-bool is_interior_chord_vertex_vertex(
-        const std::vector<std::vector<Point>>& polygon,
-        const IndexPair& from,
-        const IndexPair& to) {
-
-    Segment segment = {polygon[from.i][from.j], polygon[to.i][to.j]};
-    Point angle_range = get_angle_range(polygon, from);
-
-    // a segment collision if the segment starts from a
-    // vertex and immediately leaves the polygon
-    if (!pointing_inside(segment, angle_range)) return false;
-
-    // if it is pointing inside, the remainder of the check is the same
-    return is_interior_chord_start_or_end(polygon, segment);
-}
-
+/*
+ * @return true if a chord (know to contain at least one
+ *         of the start or end points) is interior to
+ *         the polygon, false otherwise
+ */
 bool is_interior_chord_start_or_end(
         const std::vector<std::vector<Point>>& polygon,
         const Segment& segment) {
@@ -184,6 +183,31 @@ bool is_interior_chord_start_or_end(
     return true;
 }
 
+/*
+ * @return true if a chord (know to not contain
+ *         the start or end points) is interior to
+ *         the polygon, false otherwise
+ */
+bool is_interior_chord_vertex_vertex(
+        const std::vector<std::vector<Point>>& polygon,
+        const IndexPair& from,
+        const IndexPair& to) {
+
+    Segment segment = {polygon[from.i][from.j], polygon[to.i][to.j]};
+    Point angle_range = get_angle_range(polygon, from);
+
+    // a segment collision if the segment starts from a
+    // vertex and immediately leaves the polygon
+    if (!pointing_inside(segment, angle_range)) return false;
+
+    // if it is pointing inside, the remainder of the check is the same
+    return is_interior_chord_start_or_end(polygon, segment);
+}
+
+/*
+ * Populates the adjacency list with chords containing
+ * at least one of the start or end points
+ */
 void populate_interior_adjacency(
         const std::vector<std::vector<Point>>& polygon,
         const Point& start,
@@ -214,6 +238,10 @@ void populate_interior_adjacency(
     }
 }
 
+/*
+ * Populates the adjacency list with chords containing
+ * neither the start point or end point
+ */
 void populate_vertex_adjacency(
         const std::vector<std::vector<Point>>& polygon,
         const Point& start,
@@ -251,8 +279,13 @@ void populate_vertex_adjacency(
     }
 }
 
+/*
+ * @return the total number of points in a polygon
+ *         (exterior and hole vertices) plus two to
+ *         account for the start and end points
+ */
 size_t dijkstra_points(const std::vector<std::vector<Point>>& polygon) {
-    size_t dijkstra_points = 2;
+    size_t dijkstra_points = 2; // start and end point
     for (size_t i = 0; i < polygon.size(); i++) {
         dijkstra_points += polygon[i].size();
     }
@@ -283,6 +316,10 @@ std::vector<std::vector<Edge>> generate_adjacency_list(
     return adj_list;
 }
 
+/*
+ * @return the index in the flattened polygon data structure
+ *         that is pointed to by an IndexPair
+ */
 size_t idxp_to_idx(const std::vector<std::vector<Point>>& polygon, const IndexPair& idxp) {
     if (idxp.interior) return idxp.i;
     size_t idx = 0;
@@ -293,6 +330,10 @@ size_t idxp_to_idx(const std::vector<std::vector<Point>>& polygon, const IndexPa
     return idx + 2;
 }
 
+/*
+ * @return the IndexPair that is equivalent to idx, which represents
+ *         the index in the flattened polygon data structure
+ */
 IndexPair idx_to_idxp(const std::vector<std::vector<Point>>& polygon, size_t idx) {
     if (idx == 0) return START_IDXP;
     if (idx == 1) return END_IDXP;
@@ -305,11 +346,13 @@ IndexPair idx_to_idxp(const std::vector<std::vector<Point>>& polygon, size_t idx
     return IndexPair(-1, -1);
 }
 
+// tracks shortest known route from start to idxp
 struct PathDistance {
     IndexPair idxp;
     double path_distance;
 };
 
+// a comparator to pass to a std::priority_queue
 struct ComparePathDistance {
     bool operator()(const PathDistance& d1, const PathDistance& d2) {
         return d1.path_distance > d2.path_distance;
@@ -327,6 +370,7 @@ DijkstraData dijkstra_path(
     std::priority_queue<PathDistance, std::vector<PathDistance>, ComparePathDistance> point_queue;
     std::vector<double> distances(total_points);
 
+    // set up for Dijkstra'a algorithm: distance to start = 0, other distances = inf.
     point_queue.push((PathDistance) {START_IDXP, 0});
     point_queue.push((PathDistance) {END_IDXP, __DBL_MAX__});
     size_t dist_idx = 0;
@@ -364,6 +408,7 @@ DijkstraData dijkstra_path(
         }
     }
 
+    // use results to construct return data
     std::vector<Point> dijkstra_path;
     size_t backtrack_idx = END_IDX;
     while (prev_point_in_shortest_path[backtrack_idx] != START_IDX) {

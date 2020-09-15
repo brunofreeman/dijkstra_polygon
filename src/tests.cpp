@@ -57,7 +57,7 @@ int main(int argc, char** argv) {
      * @shape    unit square with 0.2-side square
      *           hole in the middle
      * @start    off the bottom left corner
-     * @end off  the top right corner
+     * @end      off the top right corner
      * @location centered on origin
      */
     names.emplace_back("sq_in_sq");

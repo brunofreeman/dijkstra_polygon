@@ -26,6 +26,8 @@ struct Segment {
 /*
  * Represents a vertex of the polygon if interior is false
  * or the start/end point if interior is true.
+ * If a vertex, i = 0 represents the border, a hole otherwise.
+ * j is the index within the border or hole.
  */
 struct IndexPair {
     size_t i;
@@ -33,7 +35,6 @@ struct IndexPair {
     bool interior;
 
     IndexPair(size_t i, size_t j) : i(i), j(j), interior(false) {}
-
     IndexPair(size_t i, size_t j, bool interior) : i(i), j(j), interior(interior) {}
 };
 
@@ -41,25 +42,6 @@ struct Edge {
     IndexPair idxp;
     double distance;
 };
-
-/*
- * Determines if a segment from one polygon (or hole)
- * vertex to another is completely inside of the polygon.
- */
-bool is_interior_chord_vertex_vertex(
-        const std::vector<std::vector<Point>>& polygon,
-        const IndexPair& from,
-        const IndexPair& to
-);
-
-/*
- * Determines if a segment that includes start or end
- * as one of its endpoints is completely inside of the polygon.
- */
-bool is_interior_chord_start_or_end(
-        const std::vector<std::vector<Point>>& polygon,
-        const Segment& segment
-);
 
 /*
  * Generates the adjacency list of the graph representing

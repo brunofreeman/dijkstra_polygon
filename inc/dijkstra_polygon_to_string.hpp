@@ -16,8 +16,8 @@ std::string to_string(const IndexPair& idxp);
 
 std::string to_string(const Edge& edge);
 
-std::string
-to_string(const std::vector<std::vector<Point>>& polygon, const std::vector<std::vector<Edge>>& adj_list);
+std::string to_string(const std::vector<std::vector<Point>>& polygon,
+                      const std::vector<std::vector<Edge>>& adj_list);
 
 std::string to_string(const std::vector<std::vector<Point>>& polygon);
 

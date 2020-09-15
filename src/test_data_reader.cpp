@@ -3,7 +3,7 @@
 #include "test_util.hpp"
 #include <iostream>
 
-const std::string TEST_FOLDER = "def";
+const std::string TEST_FOLDER = "tests";
 const std::string COMMENT_TOKEN = "//";
 const std::string SHAPE_DELIMITER = "#SHAPE";
 const std::string START_END_DELIMITER = "#START_END";
