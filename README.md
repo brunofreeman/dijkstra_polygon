@@ -1,6 +1,6 @@
 # dijkstra_polygon
 ## Functionality
-`dijkstra_polygon` finds the shortest interior path between two points in an arbitrary non-self-intersecting polygon with holes by constructing the adjacency list of the polygon graph and applying Dijkstra's algorithm.
+`dijkstra_polygon` finds the shortest interior path between two points in an arbitrary concave polygon with holes by constructing the adjacency list of the polygon graph and applying Dijkstra's algorithm.
 
 ## Installation
 `CMakeLists.txt` will build, by default, a dynamic library with the functionality of `dijkstra_polygon.cpp`. `CMakeLists.txt` can be modified to build a static library and/or include `to_string` functionality from `dijkstra_polygon_to_string.cpp`.
